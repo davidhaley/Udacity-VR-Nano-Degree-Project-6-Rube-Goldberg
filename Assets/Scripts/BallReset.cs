@@ -17,7 +17,6 @@ public class BallReset : MonoBehaviour {
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-            Debug.Log("his the ground");
             gameObject.transform.position = resetPosition;
             gameObject.transform.GetComponent<Rigidbody>().velocity = resetVelocity;
         }
