@@ -235,7 +235,7 @@ namespace Valve.VR.InteractionSystem
 		{
 			Hand oldPointerHand = pointerHand;
 			Hand newPointerHand = null;
-            leftHand = Valve.VR.InteractionSystem.Player.instance.leftHand;
+            leftHand = player.leftHand;
 
 			//foreach ( Hand hand in player.hands )
 			//{
