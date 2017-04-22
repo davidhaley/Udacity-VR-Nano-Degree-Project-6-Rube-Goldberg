@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+// Purpose: Manage score panel
+
 public class ScoreManager : MonoBehaviour {
 
     public Text description;
@@ -17,7 +19,9 @@ public class ScoreManager : MonoBehaviour {
 
     private void OnEnable()
     {
-        BallReset.ballTouchedGround += OnBallTouchedGround;
+        Ball.ballTouchedGround += OnBallTouchedGround;
+        Ball.ballTouchedCollectable += OnBallTouchedCollectable;
+        Ball.ballTouchedGoal += OnBallTouchedGoal;
     }
 
     private void Awake()
@@ -59,11 +63,6 @@ public class ScoreManager : MonoBehaviour {
     private void SetScore()
     {
         currentScore.text = score.ToString() + " of";
-
-        if (CollectablesManager.CollectablesRemaining() == 0)
-        {
-            Win();
-        }
     }
 
     private void Win()
@@ -75,6 +74,19 @@ public class ScoreManager : MonoBehaviour {
     private void OnBallTouchedGround()
     {
         ResetScore();
+    }
+
+    private void OnBallTouchedCollectable()
+    {
+        IncreaseScore();
+    }
+
+    private void OnBallTouchedGoal()
+    {
+        if (CollectablesManager.CollectablesRemaining() == 0)
+        {
+            Win();
+        }
     }
 
     private void ResetScore()

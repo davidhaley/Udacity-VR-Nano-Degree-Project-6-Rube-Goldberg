@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// Purpose: Keep track of collectables remaining and reset collectables when ball touches ground
+
 public class CollectablesManager : MonoBehaviour {
 
     public static GameObject[] collectables;
 
     private void OnEnable()
     {
-        BallReset.ballTouchedGround += OnBallTouchedGround;
+        Ball.ballTouchedGround += OnBallTouchedGround;
     }
 
     private void Start()
