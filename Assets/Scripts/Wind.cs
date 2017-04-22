@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class Wind : MonoBehaviour {
 
+    public float force = 100000f; // Force magnitude required for the ball to act in a realistic manner
+
     private Collider ball;
 
-    private float force = 100000f;
     private float radius;
     private float surfaceArea;
     private float distance;
@@ -16,6 +17,7 @@ public class Wind : MonoBehaviour {
     {
         if (ball != null)
         {
+            // Distance between the fan and the ball
             distance = Vector3.Distance(transform.position, ball.transform.position);
         }
     }

@@ -8,7 +8,7 @@ public class Fan : MonoBehaviour {
     public GameObject fanBlades;
     public ParticleSystem fanParticleSystem;
     public GameObject fanSwitch;
-    public Image panelImage;
+    public Canvas panelCanvas;
     public bool awakeOn;
 
     private bool on;
@@ -20,12 +20,17 @@ public class Fan : MonoBehaviour {
     private Material offMaterial;
     private Color onColor;
     private Color offColor;
+    private Image image;
+    private Text text;
 
     private void Awake()
     {
         switchRenderer = fanSwitch.GetComponent<Renderer>();
         onMaterial = Resources.Load<Material>("Materials/SwitchOn");
         offMaterial = Resources.Load<Material>("Materials/SwitchOff");
+
+        image = panelCanvas.GetComponentInChildren<Image>();
+        text = panelCanvas.GetComponentInChildren<Text>();
 
         on = false;
         switchRenderer.material = offMaterial;
@@ -62,19 +67,20 @@ public class Fan : MonoBehaviour {
 
     public void Switch()
     {
-        Debug.Log("hand clicked switch");
         on = !on;
 
         if (on)
         {
+            text.text = "On";
             switchRenderer.material = onMaterial;
-            panelImage.color = onColor;
+            image.color = onColor;
             fanSwitch.transform.Rotate(Vector3.up, 90f);
         }
         else
         {
+            text.text = "Off";
             switchRenderer.material = offMaterial;
-            panelImage.color = offColor;
+            image.color = offColor;
             fanSwitch.transform.Rotate(Vector3.up, -90f);
         }
     }
