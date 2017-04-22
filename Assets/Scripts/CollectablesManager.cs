@@ -6,10 +6,19 @@ public class CollectablesManager : MonoBehaviour {
 
     public static GameObject[] collectables;
 
+    private void OnEnable()
+    {
+        BallReset.ballTouchedGround += OnBallTouchedGround;
+    }
+
     private void Start()
     {
         collectables = GameObject.FindGameObjectsWithTag("Collectable");
-        Debug.Log("collectable length: " + collectables.Length);
+    }
+
+    private void OnBallTouchedGround()
+    {
+        ResetCollectables();
     }
 
     private void ResetCollectables()
@@ -41,29 +50,4 @@ public class CollectablesManager : MonoBehaviour {
             return -1;
         }
     }
-
-    //void Start()
-    //{
-
-    //    origins = new Vector3[collectables.Length];
-
-    //    for (int i = 0; i < origins.Length; i++)
-    //    {
-    //        origins[i] = collectables[i].gameObject.transform.position;
-    //    }
-    //}
-
-    //// Update is called once per frame
-    //void Update()
-    //{
-
-    //}
-
-    //private void ResetCollectables()
-    //{
-    //    for (int i = 0; i < collectables.Length; i++)
-    //    {
-    //        collectables[i].gameObject.transform.position = origins[i];
-    //    }
-    //}
 }

@@ -7,6 +7,10 @@ public class BallReset : MonoBehaviour {
     private Vector3 resetPosition;
     private Vector3 resetVelocity;
 
+    public delegate void BallTouchedGround();
+
+    public static event BallTouchedGround ballTouchedGround;
+
     private void Start()
     {
         resetPosition = transform.position;
@@ -19,6 +23,11 @@ public class BallReset : MonoBehaviour {
         {
             gameObject.transform.position = resetPosition;
             gameObject.transform.GetComponent<Rigidbody>().velocity = resetVelocity;
+
+            if (ballTouchedGround != null)
+            {
+                ballTouchedGround();
+            }
         }
     }
 }

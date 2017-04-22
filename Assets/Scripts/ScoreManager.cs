@@ -15,16 +15,25 @@ public class ScoreManager : MonoBehaviour {
 
     private List<Text> texts;
 
-    void Start()
+    private void OnEnable()
     {
-        InitializeScore();
+        BallReset.ballTouchedGround += OnBallTouchedGround;
+    }
+
+    private void Awake()
+    {
         AddTextsToList();
     }
 
-    public int CurrentScore
+    void Start()
     {
-        get { return score; }
+        InitializeScore();
     }
+
+    //public int CurrentScore
+    //{
+    //    get { return score; }
+    //}
 
     public void IncreaseScore()
     {
@@ -34,9 +43,14 @@ public class ScoreManager : MonoBehaviour {
 
     private void InitializeScore()
     {
+        ActivateTexts();
+        win.gameObject.SetActive(false);
+
         currentScore.text = "";
         totalScore.text = "";
         description.text = "Stars Collected:";
+
+        score = 0;
 
         currentScore.text = score.ToString() + " of";
         totalScore.text = CollectablesManager.CollectablesRemaining().ToString();
@@ -58,6 +72,16 @@ public class ScoreManager : MonoBehaviour {
         win.gameObject.SetActive(true);
     }
 
+    private void OnBallTouchedGround()
+    {
+        ResetScore();
+    }
+
+    private void ResetScore()
+    {
+        InitializeScore();
+    }
+
     private void AddTextsToList()
     {
         texts = new List<Text>();
@@ -69,11 +93,23 @@ public class ScoreManager : MonoBehaviour {
 
     private void DeactivateTexts()
     {
-        Debug.Log("deactivating texts");
-
         foreach (Text text in texts)
         {
-            text.gameObject.SetActive(false);
+            if (text.gameObject.activeSelf)
+            {
+                text.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    private void ActivateTexts()
+    {
+        foreach (Text text in texts)
+        {
+            if (text.gameObject.activeSelf == false)
+            {
+                text.gameObject.SetActive(true);
+            }
         }
     }
 }
