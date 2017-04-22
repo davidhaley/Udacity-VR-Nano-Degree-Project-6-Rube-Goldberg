@@ -6,9 +6,10 @@ using UnityEngine.UI;
 public class Fan : MonoBehaviour {
 
     public GameObject fanBlades;
-    public ParticleSystem fanAir;
+    public ParticleSystem fanParticleSystem;
     public GameObject fanSwitch;
     public Image panelImage;
+    public bool awakeOn;
 
     private bool on;
 
@@ -31,6 +32,11 @@ public class Fan : MonoBehaviour {
 
         onColor = new Color32(122, 212, 111, 150);
         offColor = new Color32(255, 69, 0, 150);
+
+        if (awakeOn)
+        {
+            Switch();
+        }
     }
 
     private void Update()
@@ -40,16 +46,16 @@ public class Fan : MonoBehaviour {
             // One 360 degree rotation per second, muliplied by speed (ie. 4 means 4 360 degree rotations per second)
             fanBlades.transform.Rotate(Vector3.forward, (Time.deltaTime * 360) * speed);
 
-            if (fanAir.gameObject.activeSelf == false)
+            if (fanParticleSystem.gameObject.activeSelf == false)
             {
-                fanAir.gameObject.SetActive(true);
+                fanParticleSystem.gameObject.SetActive(true);
             }
         }
         else if (!on)
         {
-            if (fanAir.gameObject.activeSelf == true)
+            if (fanParticleSystem.gameObject.activeSelf == true)
             {
-                fanAir.gameObject.SetActive(false);
+                fanParticleSystem.gameObject.SetActive(false);
             }
         }
     }
