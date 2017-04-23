@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MusicController : MonoBehaviour
+public class AudioController : MonoBehaviour
 {
     public AudioSource[] audioSources;
 

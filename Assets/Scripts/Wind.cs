@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// Purpose: Apply wind force to object. This is attached to a wind particle system game object.
+//          When the particle system is enabled (when fan is turned on), and the object enters and
+//          Stays in the collision zone, the force will be applied.
+
 public class Wind : MonoBehaviour {
 
     public float force = 100000f; // Force magnitude required for the ball to act in a realistic manner
@@ -20,6 +24,13 @@ public class Wind : MonoBehaviour {
             // Distance between the fan and the ball
             distance = Vector3.Distance(transform.position, ball.transform.position);
         }
+    }
+
+    public float Force
+    {
+        get { return force; }
+
+        set { force = value; }
     }
 
     private void OnTriggerStay(Collider col)
