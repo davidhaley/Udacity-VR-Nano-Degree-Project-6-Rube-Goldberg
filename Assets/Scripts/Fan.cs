@@ -16,6 +16,8 @@ public class Fan : MonoBehaviour
     public Image speedLowImg;
     public Image speedMedImg;
     public Image speedHighImg;
+    public AudioSource audioSourceFan;
+    public AudioSource audioSourceSwitch;
 
     private Renderer switchRenderer;
     private Material switchOnMaterial;
@@ -29,11 +31,15 @@ public class Fan : MonoBehaviour
     private Color speedActiveColor;
     private Color speedInactiveColor;
 
+    private AudioClip fanSwitchOn;
+    private AudioClip fanSwitchOff;
+
     private bool on = false;
 
     private void Awake()
     {
-        InitializeFanSwitches();
+        InitializeFanPanelUI();
+        SetupAudioSources();
 
         fanSpeed = new FanSpeedLow();
         speedLowImg.color = speedActiveColor;
@@ -64,6 +70,32 @@ public class Fan : MonoBehaviour
         }
     }
 
+    private void OnSwitchAudio()
+    {
+        audioSourceSwitch.clip = fanSwitchOn;
+        audioSourceSwitch.Play();
+
+        ChangeSpeedFanAudio(fanSpeed);
+    }
+
+    public void OffSwitchAudio()
+    {
+        audioSourceSwitch.clip = fanSwitchOff;
+        audioSourceSwitch.Play();
+
+        audioSourceFan.Stop();
+    }
+
+    public void ChangeSpeedFanAudio(FanSpeed fanSpeed)
+    {
+        audioSourceFan.clip = fanSpeed.audioClip;
+
+        if (on)
+        {
+            audioSourceFan.Play();
+        }
+    }
+
     public void Switch()
     {
         on = !on;
@@ -74,6 +106,8 @@ public class Fan : MonoBehaviour
             switchRenderer.material = switchOnMaterial;
             switchImg.color = switchOnColor;
             fanSwitch.transform.Rotate(Vector3.up, 90f);
+
+            OnSwitchAudio();
         }
         else
         {
@@ -81,6 +115,8 @@ public class Fan : MonoBehaviour
             switchRenderer.material = switchOffMaterial;
             switchImg.color = switchOffColor;
             fanSwitch.transform.Rotate(Vector3.up, -90f);
+
+            OffSwitchAudio();
         }
     }
 
@@ -116,6 +152,7 @@ public class Fan : MonoBehaviour
             speedHighImg.color = speedInactiveColor;
         }
 
+        ChangeSpeedFanAudio(fanSpeed);
         dialRotation = fanSpeed.DialRotation;
         SpeedDialPosition(dialRotation);
     }
@@ -131,7 +168,19 @@ public class Fan : MonoBehaviour
         fanBlades.transform.Rotate(Vector3.forward, (Time.deltaTime * 360) * fanSpeed.Speed);
     }
 
-    private void InitializeFanSwitches()
+    private void SetupAudioSources()
+    {
+        fanSwitchOn = Resources.Load<AudioClip>("Sounds/Fan/FanSwitchOn");
+        fanSwitchOff = Resources.Load<AudioClip>("Sounds/Fan/FanSwitchOff");
+
+        audioSourceFan.loop = true;
+        audioSourceFan.playOnAwake = false;
+
+        audioSourceSwitch.loop = false;
+        audioSourceSwitch.playOnAwake = false;
+    }
+
+    private void InitializeFanPanelUI()
     {
         switchOnMaterial = Resources.Load<Material>("Materials/SwitchOn");
         switchOffMaterial = Resources.Load<Material>("Materials/SwitchOff");

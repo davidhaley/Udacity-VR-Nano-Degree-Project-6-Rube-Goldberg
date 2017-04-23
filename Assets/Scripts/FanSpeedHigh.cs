@@ -9,17 +9,20 @@ public class FanSpeedHigh : FanSpeed
 
     public override float Speed
     {
-        get
-        {
-            return 6f;
-        }
+        get { return 6f; }
     }
 
     public override Quaternion DialRotation
     {
+        get { return Quaternion.Euler(0f, 0f, 90f); }
+    }
+
+    public override AudioClip audioClip
+    {
         get
         {
-            return Quaternion.Euler(0f, 0f, 90f);
+            AudioClip clip = Resources.Load<AudioClip>("Sounds/Fan/FanHigh");
+            return clip;
         }
     }
 }
