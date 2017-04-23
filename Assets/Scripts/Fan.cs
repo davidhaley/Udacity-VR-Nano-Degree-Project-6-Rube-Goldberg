@@ -70,32 +70,6 @@ public class Fan : MonoBehaviour
         }
     }
 
-    private void OnSwitchAudio()
-    {
-        audioSourceSwitch.clip = fanSwitchOn;
-        audioSourceSwitch.Play();
-
-        ChangeSpeedFanAudio(fanSpeed);
-    }
-
-    public void OffSwitchAudio()
-    {
-        audioSourceSwitch.clip = fanSwitchOff;
-        audioSourceSwitch.Play();
-
-        audioSourceFan.Stop();
-    }
-
-    public void ChangeSpeedFanAudio(FanSpeed fanSpeed)
-    {
-        audioSourceFan.clip = fanSpeed.audioClip;
-
-        if (on)
-        {
-            audioSourceFan.Play();
-        }
-    }
-
     public void Switch()
     {
         on = !on;
@@ -128,7 +102,7 @@ public class Fan : MonoBehaviour
         {
             fanSpeed = new FanSpeedMed();
             speedMedImg.color = speedActiveColor;
-            wind.Force = 100000f;
+            wind.Force = 125000f;
 
             speedLowImg.color = speedInactiveColor;
             speedHighImg.color = speedInactiveColor;
@@ -137,7 +111,7 @@ public class Fan : MonoBehaviour
         {
             fanSpeed = new FanSpeedHigh();
             speedHighImg.color = speedActiveColor;
-            wind.Force = 150000f;
+            wind.Force = 175000f;
 
             speedMedImg.color = speedInactiveColor;
             speedLowImg.color = speedInactiveColor;
@@ -146,7 +120,7 @@ public class Fan : MonoBehaviour
         {
             fanSpeed = new FanSpeedLow();
             speedLowImg.color = speedActiveColor;
-            wind.Force = 50000f;
+            wind.Force = 75000f;
 
             speedMedImg.color = speedInactiveColor;
             speedHighImg.color = speedInactiveColor;
@@ -155,6 +129,32 @@ public class Fan : MonoBehaviour
         ChangeSpeedFanAudio(fanSpeed);
         dialRotation = fanSpeed.DialRotation;
         SpeedDialPosition(dialRotation);
+    }
+
+    private void OnSwitchAudio()
+    {
+        audioSourceSwitch.clip = fanSwitchOn;
+        audioSourceSwitch.Play();
+
+        ChangeSpeedFanAudio(fanSpeed);
+    }
+
+    public void OffSwitchAudio()
+    {
+        audioSourceSwitch.clip = fanSwitchOff;
+        audioSourceSwitch.Play();
+
+        audioSourceFan.Stop();
+    }
+
+    public void ChangeSpeedFanAudio(FanSpeed fanSpeed)
+    {
+        audioSourceFan.clip = fanSpeed.audioClip;
+
+        if (on)
+        {
+            audioSourceFan.Play();
+        }
     }
 
     private void SpeedDialPosition(Quaternion dialRotation)
