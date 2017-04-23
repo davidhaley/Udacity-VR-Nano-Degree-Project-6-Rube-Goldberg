@@ -17,9 +17,12 @@ public class Ball : MonoBehaviour {
     private Vector3 resetPosition;
     private Vector3 resetVelocity;
 
+    private AudioSource collectableAudioSource;
+
     private void Start()
     {
         InitializeBall();
+        LoadCollectableAudio();
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -47,6 +50,8 @@ public class Ball : MonoBehaviour {
     {
         if (col.gameObject.CompareTag("Collectable"))
         {
+            collectableAudioSource.Play();
+
             col.gameObject.SetActive(false);
 
             if (ballTouchedCollectable != null)
@@ -66,5 +71,18 @@ public class Ball : MonoBehaviour {
     {
         gameObject.transform.position = resetPosition;
         gameObject.transform.GetComponent<Rigidbody>().velocity = resetVelocity;
+    }
+
+    private void LoadCollectableAudio()
+    {
+        AudioClip clip = Resources.Load<AudioClip>("Sounds/Effects/Collectable");
+
+        collectableAudioSource = gameObject.AddComponent<AudioSource>();
+        collectableAudioSource.playOnAwake = false;
+        collectableAudioSource.clip = clip;
+
+        Phonon.PhononSource phonon = gameObject.AddComponent<Phonon.PhononSource>();
+        phonon.enableReflections = true;
+        phonon.directBinauralEnabled = true;
     }
 }
