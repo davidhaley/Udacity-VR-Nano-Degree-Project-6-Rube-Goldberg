@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 using Valve.VR.InteractionSystem;
 
 // Purpose: Announce ball collisions, play sounds, and reset ball to start position when it touches the ground
@@ -24,17 +25,33 @@ public class Ball : MonoBehaviour {
     private Vector3 resetPosition;
     private Vector3 resetVelocity;
 
+    private PlaySound collectablePlaySound;
+    private PlaySound trampolinePlaySound;
+    private PlaySound metalPlankPlaySound;
+
     private AudioSource collectableAudioSource;
-    private PlaySound trampolineAudioSource;
-    private PlaySound metalPlankAudioSource;
+    private AudioSource trampolineAudioSource;
+    private AudioSource metalPlankAudioSource;
+
+    AudioMixer audioMixer;
 
     private void Awake()
     {
         InitializeBall();
-        LoadPhononEffect();
+
+        audioMixer = Resources.Load("MasterMixer") as AudioMixer;
+    }
+
+    private void Start()
+    {
         LoadCollectableAudio();
         LoadTrampolineAudio();
         LoadMetalPlankAudio();
+    }
+
+    private void Update()
+    {
+        Debug.Log(audioMixer.FindMatchingGroups("Effects")[0]);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -58,27 +75,19 @@ public class Ball : MonoBehaviour {
         }
         else if (collision.gameObject.CompareTag("Trampoline"))
         {
-            trampolineAudioSource.Play();
+            trampolinePlaySound.Play();
         }
         else if (collision.gameObject.CompareTag("MetalPlank"))
         {
-            metalPlankAudioSource.PlayLooping();
+            metalPlankPlaySound.PlayLooping();
         }
     }
-
-    //private void OnCollisionStay(Collision collision)
-    //{
-    //    if (collision.gameObject.CompareTag("MetalPlank"))
-    //    {
-    //        metalPlankAudioSource.PlayLooping();
-    //    }
-    //}
 
     private void OnCollisionExit(Collision collision)
     {
         if (collision.gameObject.CompareTag("MetalPlank"))
         {
-            metalPlankAudioSource.Stop();
+            metalPlankPlaySound.Stop();
         }
     }
 
@@ -86,7 +95,7 @@ public class Ball : MonoBehaviour {
     {
         if (col.gameObject.CompareTag("Collectable"))
         {
-            collectableAudioSource.Play();
+            collectablePlaySound.Play();
 
             col.gameObject.SetActive(false);
 
@@ -111,11 +120,18 @@ public class Ball : MonoBehaviour {
 
     private void LoadCollectableAudio()
     {
-        AudioClip clip = Resources.Load<AudioClip>("Sounds/Effects/Collectable");
+        AudioClip clip1 = Resources.Load<AudioClip>("Sounds/Effects/Collectable");
+        AudioClip[] clips = new AudioClip[1];
+        clips[0] = clip1;
 
-        collectableAudioSource = collectableAudio.AddComponent<AudioSource>();
+        collectablePlaySound = collectableAudio.AddComponent<PlaySound>();
+        collectablePlaySound.waveFile = clips;
+
+        collectableAudioSource = collectableAudio.GetComponent<AudioSource>();
         collectableAudioSource.playOnAwake = false;
-        collectableAudioSource.clip = clip;
+        collectableAudioSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Effects")[0];
+
+        LoadPhononEffect(collectableAudio);
     }
 
     private void LoadTrampolineAudio()
@@ -129,9 +145,14 @@ public class Ball : MonoBehaviour {
         clips[1] = clip2;
         clips[2] = clip3;
 
-        trampolineAudioSource = trampolineAudio.AddComponent<PlaySound>();
+        trampolinePlaySound = trampolineAudio.AddComponent<PlaySound>();
+        trampolinePlaySound.waveFile = clips;
 
-        trampolineAudioSource.waveFile = clips;
+        trampolineAudioSource = trampolineAudio.GetComponent<AudioSource>();
+        trampolineAudioSource.playOnAwake = false;
+        trampolineAudioSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Effects")[0];
+
+        LoadPhononEffect(trampolineAudio);
     }
 
     private void LoadMetalPlankAudio()
@@ -141,18 +162,22 @@ public class Ball : MonoBehaviour {
         AudioClip[] clips = new AudioClip[1];
         clips[0] = clip1;
 
-        metalPlankAudioSource = metalPlankAudio.AddComponent<PlaySound>();
-        metalPlankAudioSource.useRandomVolume = false;
-        metalPlankAudioSource.stopOnPlay = true;
-        metalPlankAudioSource.looping = true;
-        metalPlankAudioSource.waveFile = clips;
+        metalPlankPlaySound = metalPlankAudio.AddComponent<PlaySound>();
+        metalPlankPlaySound.useRandomVolume = false;
+        metalPlankPlaySound.stopOnPlay = true;
+        metalPlankPlaySound.looping = true;
+        metalPlankPlaySound.waveFile = clips;
 
-        metalPlankAudio.GetComponent<AudioSource>().playOnAwake = false;
+        metalPlankAudioSource = metalPlankAudio.GetComponent<AudioSource>();
+        metalPlankAudioSource.playOnAwake = false;
+        metalPlankAudioSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Effects")[0];
+
+        LoadPhononEffect(metalPlankAudio);
     }
 
-    private void LoadPhononEffect()
+    private void LoadPhononEffect(GameObject go)
     {
-        Phonon.PhononSource phonon = gameObject.AddComponent<Phonon.PhononSource>();
+        Phonon.PhononSource phonon = go.AddComponent<Phonon.PhononSource>();
         phonon.enableReflections = true;
         phonon.directBinauralEnabled = true;
     }
