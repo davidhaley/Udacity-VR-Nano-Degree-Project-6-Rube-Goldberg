@@ -57,6 +57,7 @@ public class ScoreManager : MonoBehaviour {
         score = 0;
 
         currentScore.text = score.ToString() + " of";
+        CollectablesManager.ResetCollectables();
         totalScore.text = CollectablesManager.CollectablesRemaining().ToString();
     }
 

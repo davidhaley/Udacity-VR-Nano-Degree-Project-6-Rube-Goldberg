@@ -49,11 +49,6 @@ public class Ball : MonoBehaviour {
         LoadMetalPlankAudio();
     }
 
-    private void Update()
-    {
-        Debug.Log(audioMixer.FindMatchingGroups("Effects")[0]);
-    }
-
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))

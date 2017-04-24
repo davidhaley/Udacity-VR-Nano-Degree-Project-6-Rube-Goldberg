@@ -13,7 +13,7 @@ public class CollectablesManager : MonoBehaviour {
         Ball.ballTouchedGround += OnBallTouchedGround;
     }
 
-    private void Start()
+    private void Awake()
     {
         collectables = GameObject.FindGameObjectsWithTag("Collectable");
     }
@@ -23,7 +23,7 @@ public class CollectablesManager : MonoBehaviour {
         ResetCollectables();
     }
 
-    private void ResetCollectables()
+    public static void ResetCollectables()
     {
         for (int i = 0; i < collectables.Length; i++)
         {
