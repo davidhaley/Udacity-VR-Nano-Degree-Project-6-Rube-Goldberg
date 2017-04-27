@@ -49,6 +49,11 @@ public class Ball : MonoBehaviour {
         LoadMetalPlankAudio();
     }
 
+    private void OnAttachedToHand()
+    {
+        Debug.Log("ball attached to hand");
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
