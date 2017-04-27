@@ -5,11 +5,35 @@ using Valve.VR.InteractionSystem;
 
 public class Structure : MonoBehaviour {
 
-	private void OnAttachedToHand()
+    public delegate void AttachedToHand();
+    public delegate void DetachedFromHand();
+
+    public static event AttachedToHand onAttachedToHand;
+    public static event AttachedToHand onDetachedFromHand;
+
+    private void OnAttachedToHand()
     {
-        if (!Ball.BallWithinPlatformBounds)
+        if (onAttachedToHand != null)
         {
-            Ball.DeactivateBall();
+            onAttachedToHand();
         }
+
+        //if (!Ball.BallWithinPlatformBounds)
+        //{
+        //    Ball.DeactivateBall();
+        //}
+    }
+
+    private void OnDetatchedFromHand()
+    {
+        if (onDetachedFromHand != null)
+        {
+            onDetachedFromHand();
+        }
+
+        //if (!Ball.BallWithinPlatformBounds)
+        //{
+        //    Ball.DeactivateBall();
+        //}
     }
 }

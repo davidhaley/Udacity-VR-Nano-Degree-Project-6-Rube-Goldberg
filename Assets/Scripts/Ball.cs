@@ -33,14 +33,21 @@ public class Ball : MonoBehaviour {
     private Vector3 resetPosition;
     private Vector3 resetVelocity;
 
-    private static bool ballWithinPlatformBounds;
-    private static Renderer ballRenderer;
-    private static bool ballActive = true;
-    private static Material ballInactiveMaterial;
+    private bool ballWithinPlatformBounds;
+    private Renderer ballRenderer;
+    private bool ballActive = true;
+    private Material ballInactiveMaterial;
     private Material ballActiveMaterial;
 
+    private bool structureAttachedToHand;
 
     AudioMixer audioMixer;
+
+    private void OnEnable()
+    {
+        Structure.onAttachedToHand += OnAttachedToHand;
+        Structure.onDetachedFromHand += OnDetachedFromHand;
+    }
 
     private void Awake()
     {
@@ -56,11 +63,15 @@ public class Ball : MonoBehaviour {
         LoadMetalPlankAudio();
     }
 
-    public static bool BallWithinPlatformBounds
+    private void Update()
     {
-        get { return ballWithinPlatformBounds; }
+        if (structureAttachedToHand && !ballWithinPlatformBounds)
+        {
+            DeactivateBall();
+        }
     }
 
+    // Ball attached to hand
     private void HandAttachedUpdate()
     {
         if (ballWithinPlatformBounds)
@@ -137,6 +148,16 @@ public class Ball : MonoBehaviour {
         }
     }
 
+    private void OnAttachedToHand()
+    {
+        structureAttachedToHand = true;
+    }
+
+    private void OnDetachedFromHand()
+    {
+        structureAttachedToHand = false;
+    }
+
     private void InitializeBall()
     {
         resetPosition = transform.position;
@@ -151,7 +172,16 @@ public class Ball : MonoBehaviour {
     {
         gameObject.transform.position = resetPosition;
         gameObject.transform.GetComponent<Rigidbody>().velocity = resetVelocity;
-        ActivateBall();
+
+        // Keep ball deactivated if player holds onto structure as ball resets
+        if (structureAttachedToHand)
+        {
+            DeactivateBall();
+        }
+        else
+        {
+            ActivateBall();
+        }
     }
 
     public static void DeactivateBall()
