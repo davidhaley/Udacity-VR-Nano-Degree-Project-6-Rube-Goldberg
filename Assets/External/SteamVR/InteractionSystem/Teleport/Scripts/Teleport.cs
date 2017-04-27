@@ -63,7 +63,7 @@ namespace Valve.VR.InteractionSystem
 		public MeshRenderer floorDebugSphere;
 		public LineRenderer floorDebugLine;
 
-        private Hand leftHand;
+        private Hand teleportHand;
 
 		private LineRenderer pointerLineRenderer;
 		private GameObject teleportPointerObject;
@@ -186,7 +186,7 @@ namespace Valve.VR.InteractionSystem
 
 			Invoke( "ShowTeleportHint", 5.0f );
 
-            leftHand = ObjectMenuSelector.LeftHand;
+            teleportHand = ObjectMenuSelector.SelectorHand;
         }
 
 
@@ -238,27 +238,27 @@ namespace Valve.VR.InteractionSystem
 			Hand oldPointerHand = pointerHand;
 			Hand newPointerHand = null;
 
-            if (leftHand == null)
+            if (teleportHand == null)
             {
-                leftHand = ObjectMenuSelector.LeftHand;
+                teleportHand = ObjectMenuSelector.SelectorHand;
             }
 
 			//foreach ( Hand hand in player.hands )
 			//{
 				if ( visible )
 				{
-					if ( WasTeleportButtonReleased( leftHand ) )
+					if ( WasTeleportButtonReleased( teleportHand ) )
 					{
-						if ( pointerHand == leftHand) //This is the pointer hand
+						if ( pointerHand == teleportHand) //This is the pointer hand
 						{
 							TryTeleportPlayer();
 						}
 					}
 				}
 
-				if ( WasTeleportButtonPressed(leftHand) )
+				if ( WasTeleportButtonPressed(teleportHand) )
 				{
-					newPointerHand = leftHand;
+					newPointerHand = teleportHand;
 				}
 			//}
 
@@ -963,7 +963,7 @@ namespace Valve.VR.InteractionSystem
 			{
 				//foreach ( Hand hand in player.hands )
 				//{
-					ControllerButtonHints.HideTextHint( leftHand, EVRButtonId.k_EButton_SteamVR_Touchpad );
+					ControllerButtonHints.HideTextHint( teleportHand, EVRButtonId.k_EButton_SteamVR_Touchpad );
 				//}
 
 				StopCoroutine( hintCoroutine );
@@ -987,13 +987,13 @@ namespace Valve.VR.InteractionSystem
 				//Show the hint on each eligible hand
 				//foreach ( Hand hand in player.hands )
 				//{
-				bool showHint = IsEligibleForTeleport( leftHand );
-				bool isShowingHint = !string.IsNullOrEmpty( ControllerButtonHints.GetActiveHintText(leftHand, EVRButtonId.k_EButton_SteamVR_Touchpad ) );
+				bool showHint = IsEligibleForTeleport( teleportHand );
+				bool isShowingHint = !string.IsNullOrEmpty( ControllerButtonHints.GetActiveHintText(teleportHand, EVRButtonId.k_EButton_SteamVR_Touchpad ) );
 				if ( showHint )
 				{
 					if ( !isShowingHint )
 					{
-						ControllerButtonHints.ShowTextHint(leftHand, EVRButtonId.k_EButton_SteamVR_Touchpad, "Teleport" );
+						ControllerButtonHints.ShowTextHint(teleportHand, EVRButtonId.k_EButton_SteamVR_Touchpad, "Teleport" );
 						prevBreakTime = Time.time;
 						prevHapticPulseTime = Time.time;
 					}
@@ -1003,12 +1003,12 @@ namespace Valve.VR.InteractionSystem
 						//Haptic pulse for a few seconds
 						pulsed = true;
 
-                        leftHand.controller.TriggerHapticPulse( 500 );
+                        teleportHand.controller.TriggerHapticPulse( 500 );
 					}
 				}
 				else if ( !showHint && isShowingHint )
 				{
-					ControllerButtonHints.HideTextHint(leftHand, EVRButtonId.k_EButton_SteamVR_Touchpad );
+					ControllerButtonHints.HideTextHint(teleportHand, EVRButtonId.k_EButton_SteamVR_Touchpad );
 				}
 				//}
 

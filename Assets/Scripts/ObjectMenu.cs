@@ -9,7 +9,7 @@ public class ObjectMenu : MonoBehaviour {
     public GameObject objectMenu;
     public List<GameObject> menuObjectHolders;
 
-    private Hand rightHand;
+    private static Hand rightHand;
     private uint rightControllerIndex;
     private bool touchingRightTouchpad;
     private static bool firstTimeShown = true;
@@ -87,6 +87,11 @@ public class ObjectMenu : MonoBehaviour {
     public static bool FirstTimeShown
     {
         get { return firstTimeShown; }
+    }
+
+    public static Hand MenuHand
+    {
+        get { return rightHand; }
     }
 
     private void OnTouchpadTouch(SteamVRControllerEvents.ControllerEventArgs e)

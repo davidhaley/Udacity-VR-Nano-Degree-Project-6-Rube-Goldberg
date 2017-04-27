@@ -10,39 +10,33 @@ public class ObjectMenuSelector : MonoBehaviour {
 
     public List<GameObject> menuObjectPrefabs;
 
-    private static Hand leftHand;
+    private static Hand selectorHand;
     private GameObject menuObjectHovering;
     private GameObject prefab;
-    private uint leftControllerIndex;
-
-    private void Awake()
-    {
-        leftHand = Player.instance.leftHand;
-    }
 
     private void Update()
     {
-        if (leftHand != null)
+        if (selectorHand != null)
         {
             if (ObjectMenu.FirstTimeShown)
             {
-                if (transform.parent != leftHand.transform)
+                if (transform.parent != selectorHand.transform)
                 {
-                    transform.SetParent(leftHand.transform);
+                    transform.SetParent(selectorHand.transform);
                 }
             }
 
-            if (leftHand.hoverLayerMask != 2048)
+            if (selectorHand.hoverLayerMask != 2048)
             {
                 // Ensure left hand can interact with interactables
                 // If the player switches hands, the left hand's interactable mask
                 // May be reset from the ObjectMenu script
-                leftHand.hoverLayerMask = 2048;
+                selectorHand.hoverLayerMask = 2048;
             }
 
             if (menuObjectHovering != null)
             {
-                if (leftHand.controller.GetHairTriggerDown())
+                if (selectorHand.controller.GetHairTriggerDown())
                 {
                     if (menuObjectHovering.name == "MenuMetalPlank")
                     {
@@ -75,7 +69,7 @@ public class ObjectMenuSelector : MonoBehaviour {
         }
         else
         {
-            UpdateLeftHand();
+            UpdateSelectorHand();
         }
     }
 
@@ -92,31 +86,20 @@ public class ObjectMenuSelector : MonoBehaviour {
         menuObjectHovering = null;
     }
 
-    private void SelectorParentLeftHand()
-    {
-        leftHand = Player.instance.leftHand;
-
-        if (transform.parent != leftHand.transform)
-        {
-            transform.SetParent(leftHand.transform);
-        }
-    }
-
     private void PrefabParentLeftHand(GameObject prefab)
     {
-        prefab.transform.SetParent(leftHand.transform);
+        prefab.transform.SetParent(selectorHand.transform);
         prefab.transform.localPosition = Vector3.zero;
-        prefab.transform.rotation = leftHand.transform.rotation;
+        prefab.transform.rotation = selectorHand.transform.rotation;
     }
 
-    private void UpdateLeftHand()
+    private void UpdateSelectorHand()
     {
-        leftHand = Player.instance.leftHand;
-        leftControllerIndex = leftHand.controller.index;
+        selectorHand = ObjectMenu.MenuHand.otherHand;
     }
 
-    public static Hand LeftHand
+    public static Hand SelectorHand
     {
-        get { return leftHand; }
+        get { return selectorHand; }
     }
 }

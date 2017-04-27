@@ -32,13 +32,13 @@ public class Ball : MonoBehaviour {
 
     private Vector3 resetPosition;
     private Vector3 resetVelocity;
-    
-    private bool ballWithinPlatformBounds;
-    private Renderer ballRenderer;
-    private Material ballActiveMaterial;
-    private Material ballInactiveMaterial;
 
-    private bool ballActive = true;
+    private static bool ballWithinPlatformBounds;
+    private static Renderer ballRenderer;
+    private static bool ballActive = true;
+    private static Material ballInactiveMaterial;
+    private Material ballActiveMaterial;
+
 
     AudioMixer audioMixer;
 
@@ -54,6 +54,11 @@ public class Ball : MonoBehaviour {
         LoadCollectableAudio();
         LoadTrampolineAudio();
         LoadMetalPlankAudio();
+    }
+
+    public static bool BallWithinPlatformBounds
+    {
+        get { return ballWithinPlatformBounds; }
     }
 
     private void HandAttachedUpdate()
@@ -149,7 +154,7 @@ public class Ball : MonoBehaviour {
         ActivateBall();
     }
 
-    private void DeactivateBall()
+    public static void DeactivateBall()
     {
         ballRenderer.material = ballInactiveMaterial;
         ballActive = false;
