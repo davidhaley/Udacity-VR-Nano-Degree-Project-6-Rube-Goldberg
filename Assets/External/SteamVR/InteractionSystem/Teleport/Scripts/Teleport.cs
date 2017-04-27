@@ -185,11 +185,13 @@ namespace Valve.VR.InteractionSystem
 			CheckForSpawnPoint();
 
 			Invoke( "ShowTeleportHint", 5.0f );
-		}
+
+            leftHand = ObjectMenuSelector.LeftHand;
+        }
 
 
-		//-------------------------------------------------
-		void OnEnable()
+        //-------------------------------------------------
+        void OnEnable()
 		{
 			chaperoneInfoInitializedAction.enabled = true;
 			OnChaperoneInfoInitialized(); // In case it's already initialized
@@ -235,7 +237,11 @@ namespace Valve.VR.InteractionSystem
 		{
 			Hand oldPointerHand = pointerHand;
 			Hand newPointerHand = null;
-            leftHand = player.leftHand;
+
+            if (leftHand == null)
+            {
+                leftHand = ObjectMenuSelector.LeftHand;
+            }
 
 			//foreach ( Hand hand in player.hands )
 			//{

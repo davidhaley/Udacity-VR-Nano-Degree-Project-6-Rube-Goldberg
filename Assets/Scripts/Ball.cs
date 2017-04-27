@@ -22,9 +22,6 @@ public class Ball : MonoBehaviour {
     public GameObject metalPlankAudio;
     public GameObject woodPlankAudio;
 
-    private Vector3 resetPosition;
-    private Vector3 resetVelocity;
-
     private PlaySound collectablePlaySound;
     private PlaySound trampolinePlaySound;
     private PlaySound metalPlankPlaySound;
@@ -32,6 +29,16 @@ public class Ball : MonoBehaviour {
     private AudioSource collectableAudioSource;
     private AudioSource trampolineAudioSource;
     private AudioSource metalPlankAudioSource;
+
+    private Vector3 resetPosition;
+    private Vector3 resetVelocity;
+    
+    private bool ballWithinPlatformBounds;
+    private Renderer ballRenderer;
+    private Material ballActiveMaterial;
+    private Material ballInactiveMaterial;
+
+    private bool ballActive = true;
 
     AudioMixer audioMixer;
 
@@ -49,9 +56,16 @@ public class Ball : MonoBehaviour {
         LoadMetalPlankAudio();
     }
 
-    private void OnAttachedToHand()
+    private void HandAttachedUpdate()
     {
-        Debug.Log("ball attached to hand");
+        if (ballWithinPlatformBounds)
+        {
+            ActivateBall();
+        }
+        else if (!ballWithinPlatformBounds)
+        {
+            DeactivateBall();
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -66,7 +80,7 @@ public class Ball : MonoBehaviour {
             }
 
         }
-        else if (collision.gameObject.CompareTag("Goal"))
+        else if (collision.gameObject.CompareTag("Goal") && ballActive)
         {
             if (ballTouchedGoal != null)
             {
@@ -93,7 +107,7 @@ public class Ball : MonoBehaviour {
 
     private void OnTriggerEnter(Collider col)
     {
-        if (col.gameObject.CompareTag("Collectable"))
+        if (col.gameObject.CompareTag("Collectable") && ballActive)
         {
             collectablePlaySound.Play();
 
@@ -104,18 +118,47 @@ public class Ball : MonoBehaviour {
                 ballTouchedCollectable();
             }
         }
+        else if (col.gameObject.CompareTag("PlatformBounds"))
+        {
+            ballWithinPlatformBounds = true;
+        }
+    }
+
+    private void OnTriggerExit(Collider col)
+    {
+        if (col.gameObject.CompareTag("PlatformBounds"))
+        {
+            ballWithinPlatformBounds = false;
+        }
     }
 
     private void InitializeBall()
     {
         resetPosition = transform.position;
         resetVelocity = gameObject.GetComponent<Rigidbody>().velocity;
+
+        ballActiveMaterial = Resources.Load<Material>("Materials/BallActive");
+        ballInactiveMaterial = Resources.Load<Material>("Materials/BallInactive");
+        ballRenderer = gameObject.GetComponent<Renderer>();
     }
 
     private void ResetBall()
     {
         gameObject.transform.position = resetPosition;
         gameObject.transform.GetComponent<Rigidbody>().velocity = resetVelocity;
+        ActivateBall();
+    }
+
+    private void DeactivateBall()
+    {
+        ballRenderer.material = ballInactiveMaterial;
+        ballActive = false;
+    }
+
+    private void ActivateBall()
+    {
+        ballRenderer.material = ballActiveMaterial;
+        ballActive = true;
     }
 
     private void LoadCollectableAudio()

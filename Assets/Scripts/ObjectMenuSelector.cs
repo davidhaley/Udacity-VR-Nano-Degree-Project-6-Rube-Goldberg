@@ -10,16 +10,28 @@ public class ObjectMenuSelector : MonoBehaviour {
 
     public List<GameObject> menuObjectPrefabs;
 
-    private Hand leftHand;
+    private static Hand leftHand;
     private GameObject menuObjectHovering;
     private GameObject prefab;
+    private uint leftControllerIndex;
+
+    private void Awake()
+    {
+        leftHand = Player.instance.leftHand;
+    }
 
     private void Update()
     {
-        leftHand = Player.instance.leftHand;
-
         if (leftHand != null)
         {
+            if (ObjectMenu.FirstTimeShown)
+            {
+                if (transform.parent != leftHand.transform)
+                {
+                    transform.SetParent(leftHand.transform);
+                }
+            }
+
             if (leftHand.hoverLayerMask != 2048)
             {
                 // Ensure left hand can interact with interactables
@@ -27,8 +39,6 @@ public class ObjectMenuSelector : MonoBehaviour {
                 // May be reset from the ObjectMenu script
                 leftHand.hoverLayerMask = 2048;
             }
-
-            SelectorParentLeftHand();
 
             if (menuObjectHovering != null)
             {
@@ -63,6 +73,10 @@ public class ObjectMenuSelector : MonoBehaviour {
             }
 
         }
+        else
+        {
+            UpdateLeftHand();
+        }
     }
 
     private void OnParentHandHoverBegin(Interactable hoveringInteractable)
@@ -80,9 +94,11 @@ public class ObjectMenuSelector : MonoBehaviour {
 
     private void SelectorParentLeftHand()
     {
-        if (gameObject.transform.parent != leftHand.transform)
+        leftHand = Player.instance.leftHand;
+
+        if (transform.parent != leftHand.transform)
         {
-            gameObject.transform.SetParent(leftHand.transform);
+            transform.SetParent(leftHand.transform);
         }
     }
 
@@ -91,5 +107,16 @@ public class ObjectMenuSelector : MonoBehaviour {
         prefab.transform.SetParent(leftHand.transform);
         prefab.transform.localPosition = Vector3.zero;
         prefab.transform.rotation = leftHand.transform.rotation;
+    }
+
+    private void UpdateLeftHand()
+    {
+        leftHand = Player.instance.leftHand;
+        leftControllerIndex = leftHand.controller.index;
+    }
+
+    public static Hand LeftHand
+    {
+        get { return leftHand; }
     }
 }

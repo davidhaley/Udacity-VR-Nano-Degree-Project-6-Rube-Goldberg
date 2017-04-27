@@ -10,8 +10,9 @@ public class ObjectMenu : MonoBehaviour {
     public List<GameObject> menuObjectHolders;
 
     private Hand rightHand;
+    private uint rightControllerIndex;
     private bool touchingRightTouchpad;
-    private bool firstTimeShown = true;
+    private static bool firstTimeShown = true;
 
     private int currentObjectIndex = 0;
     private int prevObjectIndex;
@@ -29,51 +30,68 @@ public class ObjectMenu : MonoBehaviour {
         {
             objectMenu.SetActive(false);
         }
+
+        rightHand = Player.instance.rightHand;
     }
-	
-	void Update ()
+
+    void Update ()
     {
-        MenuParentRightHand();
-
-        if (touchingRightTouchpad)
+        if (rightHand != null)
         {
-            if (!objectMenu.activeSelf)
+            if (touchingRightTouchpad)
             {
-                objectMenu.SetActive(true);
+                if (!objectMenu.activeSelf)
+                {
+                    objectMenu.SetActive(true);
+                }
+                
+                if (firstTimeShown && transform.parent != rightHand.transform)
+                {
+                    MenuParentRightHand();
+                }
+
+                // Disallow right hand to interact with objects when showing menu
+                rightHand.hoverLayerMask = 0;
+
+                // Show current menu object if it is hidden
+                if (!menuObjectHolders[currentObjectIndex].gameObject.activeSelf)
+                {
+                    menuObjectHolders[currentObjectIndex].gameObject.SetActive(true);
+                }
+
+                // Hide previous menu object if it is showing
+                if (!firstTimeShown && menuObjectHolders[prevObjectIndex].gameObject.activeSelf)
+                {
+                    menuObjectHolders[prevObjectIndex].gameObject.SetActive(false);
+                }
             }
-
-            // Disallow right hand to interact with objects when showing menu
-            rightHand.hoverLayerMask = 0;
-
-            // Show current menu object if it is hidden
-            if (!menuObjectHolders[currentObjectIndex].gameObject.activeSelf)
+            else if (!touchingRightTouchpad)
             {
-                menuObjectHolders[currentObjectIndex].gameObject.SetActive(true);
-            }
+                if (objectMenu.activeSelf)
+                {
+                    objectMenu.SetActive(false);
+                }
 
-            // Hide previous menu object if it is showing
-            if (!firstTimeShown && menuObjectHolders[prevObjectIndex].gameObject.activeSelf)
-            {
-                menuObjectHolders[prevObjectIndex].gameObject.SetActive(false);
+                // Resume interactable layer mask so player can interact with objects using the right hand
+                rightHand.hoverLayerMask = 2048;
+
+                menuObjectHolders[currentObjectIndex].SetActive(false);
             }
         }
-        else if (!touchingRightTouchpad)
+        else
         {
-            if (objectMenu.activeSelf)
-            {
-                objectMenu.SetActive(false);
-            }
-
-            // Resume interactable layer mask so player can interact with objects using the right hand
-            rightHand.hoverLayerMask = 2048;
-
-            menuObjectHolders[currentObjectIndex].SetActive(false);
+            UpdateRightHand();
         }
+    }
+
+    public static bool FirstTimeShown
+    {
+        get { return firstTimeShown; }
     }
 
     private void OnTouchpadTouch(SteamVRControllerEvents.ControllerEventArgs e)
     {
-        if (e.handOrientation == "RightHand")
+        if (e.deviceIndex == rightControllerIndex)
         {
             touchingRightTouchpad = true;
         }
@@ -81,7 +99,7 @@ public class ObjectMenu : MonoBehaviour {
 
     private void OnTouchpadRelease(SteamVRControllerEvents.ControllerEventArgs e)
     {
-        if (e.handOrientation == "RightHand")
+        if (e.deviceIndex == rightControllerIndex)
         {
             touchingRightTouchpad = false;
         }
@@ -89,7 +107,7 @@ public class ObjectMenu : MonoBehaviour {
 
     private void OnTouchpadDown(SteamVRControllerEvents.ControllerEventArgs e)
     {
-        if (e.handOrientation == "RightHand")
+        if (e.deviceIndex == rightControllerIndex)
         {
             if (e.touchpadAxis.x > 0.5f)
             {
@@ -124,9 +142,14 @@ public class ObjectMenu : MonoBehaviour {
         }
     }
 
-    private void MenuParentRightHand()
+    private void UpdateRightHand()
     {
         rightHand = Player.instance.rightHand;
+        rightControllerIndex = rightHand.controller.index;
+    }
+
+    private void MenuParentRightHand()
+    {
         gameObject.transform.SetParent(rightHand.transform);
         gameObject.transform.localPosition = Vector3.zero;
         gameObject.transform.rotation = rightHand.transform.rotation;
