@@ -11,11 +11,14 @@ public class Wind : MonoBehaviour {
     public float force = 100000f; // Force magnitude required for the ball to act in a realistic manner
 
     private Collider ball;
+    private Rigidbody ballRigidbody;
 
     private float radius;
     private float surfaceArea;
     private float distance;
     private float appliedForce;
+
+    private bool ballInWindZone;
 
     private void Update()
     {
@@ -44,7 +47,7 @@ public class Wind : MonoBehaviour {
 
     private void OnTriggerExit(Collider col)
     {
-        if (col.gameObject.CompareTag("Ball") && ball != null)
+        if (col.gameObject.CompareTag("Ball"))
         {
             ball = null;
         }
@@ -52,9 +55,12 @@ public class Wind : MonoBehaviour {
 
     private void ApplyWindForce(Collider col)
     {
-        Rigidbody rigidBody = ball.GetComponent<Rigidbody>();
-        radius = ball.GetComponent<SphereCollider>().radius;
-        surfaceArea = Mathf.Pow((2 * Mathf.PI * radius), 2);
+        if (surfaceArea == 0)
+        {
+            ballRigidbody = ball.GetComponent<Rigidbody>();
+            radius = ball.GetComponent<SphereCollider>().radius;
+            surfaceArea = Mathf.Pow((2 * Mathf.PI * radius), 2);
+        }
 
         if (distance < 1f)
         {
@@ -63,6 +69,6 @@ public class Wind : MonoBehaviour {
 
         appliedForce = ((force / (1 + distance * distance)) * surfaceArea);
 
-        rigidBody.AddForce(gameObject.transform.forward * appliedForce);
+        ballRigidbody.AddForce(gameObject.transform.forward * appliedForce);
     }
 }

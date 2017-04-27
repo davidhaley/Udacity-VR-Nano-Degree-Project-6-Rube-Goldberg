@@ -184,7 +184,7 @@ public class Ball : MonoBehaviour {
         }
     }
 
-    public static void DeactivateBall()
+    private void DeactivateBall()
     {
         ballRenderer.material = ballInactiveMaterial;
         ballActive = false;
