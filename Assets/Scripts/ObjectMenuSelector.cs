@@ -143,7 +143,7 @@ public class ObjectMenuSelector : MonoBehaviour {
 
     private void SetLimitText(Text limitText, int current, int max)
     {
-        limitText.text = (max - current).ToString() + " of " + max.ToString() + " Available";
+        limitText.text = (max - current).ToString() + " Available";
     }
 
     private void OnParentHandHoverBegin(Interactable hoveringInteractable)

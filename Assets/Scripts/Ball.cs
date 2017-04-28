@@ -107,9 +107,16 @@ public class Ball : MonoBehaviour {
         {
             trampolinePlaySound.Play();
         }
-        else if (collision.gameObject.CompareTag("MetalPlank"))
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("MetalPlank"))
         {
-            metalPlankPlaySound.PlayLooping();
+            if (!metalPlankAudioSource.isPlaying)
+            {
+                metalPlankPlaySound.Play();
+            }
         }
     }
 
@@ -117,8 +124,14 @@ public class Ball : MonoBehaviour {
     {
         if (collision.gameObject.CompareTag("MetalPlank"))
         {
-            metalPlankPlaySound.Stop();
+            StartCoroutine(StopAfterDelay(metalPlankPlaySound, 0.7f));
         }
+    }
+
+    private IEnumerator StopAfterDelay(PlaySound playSound, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        playSound.Stop();
     }
 
     private void OnTriggerEnter(Collider col)
@@ -172,6 +185,7 @@ public class Ball : MonoBehaviour {
     {
         gameObject.transform.position = resetPosition;
         gameObject.transform.GetComponent<Rigidbody>().velocity = resetVelocity;
+        StopAudioSources();
 
         // Keep ball deactivated if player holds onto structure as ball resets
         if (structureAttachedToHand)
@@ -194,6 +208,14 @@ public class Ball : MonoBehaviour {
     {
         ballRenderer.material = ballActiveMaterial;
         ballActive = true;
+    }
+
+    private void StopAudioSources()
+    {
+        collectableAudioSource.Stop();
+        metalPlankAudioSource.Stop();
+        trampolineAudioSource.Stop();
+        //woodPlankAudio.Stop();
     }
 
     private void LoadCollectableAudio()
@@ -242,8 +264,6 @@ public class Ball : MonoBehaviour {
 
         metalPlankPlaySound = metalPlankAudio.AddComponent<PlaySound>();
         metalPlankPlaySound.useRandomVolume = false;
-        metalPlankPlaySound.stopOnPlay = true;
-        metalPlankPlaySound.looping = true;
         metalPlankPlaySound.waveFile = clips;
 
         metalPlankAudioSource = metalPlankAudio.GetComponent<AudioSource>();
