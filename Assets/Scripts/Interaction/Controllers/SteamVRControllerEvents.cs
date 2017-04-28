@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 
@@ -14,12 +11,19 @@ namespace MusicLab.InteractionSystem
         public struct ControllerEventArgs
         {
             public int deviceIndex;
-            public String handOrientation;
+            public String hmdTrackedHandOrientation;
+            /// <summary>
+            /// Assumes the Player singleton instance Left and Right hands are assigned (not 'Any')
+            /// </summary>
+            public String fixedHandOrientation;
             public Vector2 touchpadAxis;
             public float touchpadAngle;
         }
 
         public delegate void ControllerEvent(ControllerEventArgs e);
+
+        private SteamVR_TrackedObject trackedObject;
+        private SteamVR_Controller.Device device;
 
         //Controller events
         public static event ControllerEvent OnTriggerDown;
@@ -37,6 +41,11 @@ namespace MusicLab.InteractionSystem
         private ulong touchpad = SteamVR_Controller.ButtonMask.Touchpad;
         private ulong appMenu = SteamVR_Controller.ButtonMask.ApplicationMenu;
         private ulong systemMenu = SteamVR_Controller.ButtonMask.System;
+
+        private void Awake()
+        {
+            trackedObject = GetComponent<SteamVR_TrackedObject>();
+        }
 
         private void Update()
         {
@@ -152,7 +161,7 @@ namespace MusicLab.InteractionSystem
             }
         }
 
-        private String GetHandOrientation(uint handControllerIndex)
+        private String GetHMDTrackedHandOrientation(uint handControllerIndex)
         {
             if (handControllerIndex == SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.FarthestLeft))
             {
@@ -168,10 +177,18 @@ namespace MusicLab.InteractionSystem
             }
         }
 
+        private String GetFixedHandOrientation(uint handControllerIndex)
+        {
+            Hand hand = Player.instance.hands[handControllerIndex];
+
+            return hand.GuessCurrentHandType().ToString();
+        }
+
         private SteamVRControllerEvents.ControllerEventArgs ApplyEventArgs(ControllerEventArgs e, int i, ulong? button = null)
         {
             e.deviceIndex = i;
-            e.handOrientation = GetHandOrientation(Player.instance.hands[i].controller.index);
+            e.hmdTrackedHandOrientation = GetHMDTrackedHandOrientation(Player.instance.hands[i].controller.index);
+            e.fixedHandOrientation = GetFixedHandOrientation((uint)i);
 
             if (button == touchpad)
             {

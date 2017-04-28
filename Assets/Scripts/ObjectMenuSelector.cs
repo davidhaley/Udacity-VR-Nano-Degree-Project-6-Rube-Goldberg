@@ -21,16 +21,14 @@ public class ObjectMenuSelector : MonoBehaviour {
     public int fanMax;
     public int trampolineMax;
 
-    private static Hand selectorHand;
     private GameObject menuObjectHovering;
     private GameObject prefab;
+    private Hand leftHand;
 
     private int currentMetalPlank = 0;
     private int currentWoodPlank = 0;
     private int currentFan = 0;
     private int currentTrampoline = 0;
-
-    private List<Text> limitTexts;
 
     private void Awake()
     {
@@ -39,25 +37,24 @@ public class ObjectMenuSelector : MonoBehaviour {
 
     private void Update()
     {
-        if (selectorHand != null)
+        leftHand = Player.instance.hands[(int)Hand.HandType.Left];
+
+        if (leftHand != null)
         {
-            if (ObjectMenu.FirstTimeShown)
+            if (transform.parent != leftHand.transform)
             {
-                if (transform.parent != selectorHand.transform)
-                {
-                    transform.SetParent(selectorHand.transform);
-                }
+                transform.SetParent(leftHand.transform);
             }
 
-            if (selectorHand.hoverLayerMask != 2048)
+            if (leftHand.hoverLayerMask != 2048)
             {
                 // Interactable layer mask
-                selectorHand.hoverLayerMask = 2048;
+                leftHand.hoverLayerMask = 2048;
             }
 
             if (menuObjectHovering != null)
             {
-                if (selectorHand.controller.GetHairTriggerDown())
+                if (leftHand.controller.GetHairTriggerDown())
                 {
                     prefab = null;
 
@@ -127,10 +124,6 @@ public class ObjectMenuSelector : MonoBehaviour {
             }
 
         }
-        else
-        {
-            UpdateSelectorHand();
-        }
     }
 
     private void InitializeLimitTexts()
@@ -161,19 +154,9 @@ public class ObjectMenuSelector : MonoBehaviour {
 
     private void PrefabParentLeftHand(GameObject prefab)
     {
-        prefab.transform.SetParent(selectorHand.transform);
+        prefab.transform.SetParent(leftHand.transform);
         prefab.transform.localPosition = Vector3.zero;
-        prefab.transform.rotation = selectorHand.transform.rotation;
-    }
-
-    private void UpdateSelectorHand()
-    {
-        selectorHand = ObjectMenu.MenuHand.otherHand;
-    }
-
-    public static Hand SelectorHand
-    {
-        get { return selectorHand; }
+        prefab.transform.rotation = leftHand.transform.rotation;
     }
 
     private void MaxPrefabsInstantiated(Text text)

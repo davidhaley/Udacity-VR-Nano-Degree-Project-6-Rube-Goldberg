@@ -10,7 +10,6 @@ public class ObjectMenu : MonoBehaviour {
     public List<GameObject> menuObjectHolders;
 
     private static Hand rightHand;
-    private uint rightControllerIndex;
     private bool touchingRightTouchpad;
     private static bool firstTimeShown = true;
 
@@ -30,12 +29,12 @@ public class ObjectMenu : MonoBehaviour {
         {
             objectMenu.SetActive(false);
         }
-
-        rightHand = Player.instance.rightHand;
     }
 
     void Update ()
     {
+        rightHand = Player.instance.hands[(int)Hand.HandType.Right];
+
         if (rightHand != null)
         {
             if (touchingRightTouchpad)
@@ -45,11 +44,6 @@ public class ObjectMenu : MonoBehaviour {
                     objectMenu.SetActive(true);
                 }
                 
-                if (firstTimeShown && transform.parent != rightHand.transform)
-                {
-                    MenuParentRightHand();
-                }
-
                 // Disallow right hand to interact with objects when showing menu
                 rightHand.hoverLayerMask = 0;
 
@@ -78,25 +72,16 @@ public class ObjectMenu : MonoBehaviour {
                 menuObjectHolders[currentObjectIndex].SetActive(false);
             }
         }
-        else
-        {
-            UpdateRightHand();
-        }
     }
 
-    public static bool FirstTimeShown
+    private bool FirstTimeShown
     {
         get { return firstTimeShown; }
     }
 
-    public static Hand MenuHand
-    {
-        get { return rightHand; }
-    }
-
     private void OnTouchpadTouch(SteamVRControllerEvents.ControllerEventArgs e)
     {
-        if (e.deviceIndex == rightControllerIndex)
+        if (e.fixedHandOrientation == "Right")
         {
             touchingRightTouchpad = true;
         }
@@ -104,7 +89,7 @@ public class ObjectMenu : MonoBehaviour {
 
     private void OnTouchpadRelease(SteamVRControllerEvents.ControllerEventArgs e)
     {
-        if (e.deviceIndex == rightControllerIndex)
+        if (e.fixedHandOrientation == "Right")
         {
             touchingRightTouchpad = false;
         }
@@ -112,7 +97,7 @@ public class ObjectMenu : MonoBehaviour {
 
     private void OnTouchpadDown(SteamVRControllerEvents.ControllerEventArgs e)
     {
-        if (e.deviceIndex == rightControllerIndex)
+        if (e.fixedHandOrientation == "Right")
         {
             if (e.touchpadAxis.x > 0.5f)
             {
@@ -145,18 +130,5 @@ public class ObjectMenu : MonoBehaviour {
                 }
             }
         }
-    }
-
-    private void UpdateRightHand()
-    {
-        rightHand = Player.instance.rightHand;
-        rightControllerIndex = rightHand.controller.index;
-    }
-
-    private void MenuParentRightHand()
-    {
-        gameObject.transform.SetParent(rightHand.transform);
-        gameObject.transform.localPosition = Vector3.zero;
-        gameObject.transform.rotation = rightHand.transform.rotation;
     }
 }

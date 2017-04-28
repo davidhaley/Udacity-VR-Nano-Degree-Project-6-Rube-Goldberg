@@ -186,7 +186,7 @@ namespace Valve.VR.InteractionSystem
 
 			Invoke( "ShowTeleportHint", 5.0f );
 
-            teleportHand = ObjectMenuSelector.SelectorHand;
+            teleportHand = Valve.VR.InteractionSystem.Player.instance.leftHand;
         }
 
 
@@ -240,7 +240,7 @@ namespace Valve.VR.InteractionSystem
 
             if (teleportHand == null)
             {
-                teleportHand = ObjectMenuSelector.SelectorHand;
+                teleportHand = Valve.VR.InteractionSystem.Player.instance.leftHand;
             }
 
 			//foreach ( Hand hand in player.hands )
