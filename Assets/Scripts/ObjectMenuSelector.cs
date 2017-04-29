@@ -9,6 +9,10 @@ using Valve.VR.InteractionSystem;
 
 public class ObjectMenuSelector : MonoBehaviour {
 
+    public delegate void SpectatorCameraInstantiated();
+
+    public static event SpectatorCameraInstantiated OnSpectatorCameraInstantiated;
+
     public List<GameObject> menuObjectPrefabs;
 
     public Text metalPlankLimitText;
@@ -69,10 +73,6 @@ public class ObjectMenuSelector : MonoBehaviour {
                             currentMetalPlank += 1;
                             SetLimitText(metalPlankLimitText, currentMetalPlank, metalPlankMax);
                         }
-                        else
-                        {
-                            MaxPrefabsInstantiated(metalPlankLimitText);
-                        }
                     }
                     else if (menuObjectHovering.name == "MenuFan")
                     {
@@ -81,10 +81,6 @@ public class ObjectMenuSelector : MonoBehaviour {
                             prefab = GameObject.Instantiate(menuObjectPrefabs[1]);
                             currentFan += 1;
                             SetLimitText(fanBodyLimitText, currentFan, fanMax);
-                        }
-                        else
-                        {
-                            MaxPrefabsInstantiated(fanBodyLimitText);
                         }
                     }
                     else if (menuObjectHovering.name == "MenuWoodPlank")
@@ -95,10 +91,6 @@ public class ObjectMenuSelector : MonoBehaviour {
                             currentWoodPlank += 1;
                             SetLimitText(woodPlankLimitText, currentWoodPlank, woodPlankMax);
                         }
-                        else
-                        {
-                            MaxPrefabsInstantiated(woodPlankLimitText);
-                        }
                     }
                     else if (menuObjectHovering.name == "MenuTrampoline")
                     {
@@ -108,10 +100,6 @@ public class ObjectMenuSelector : MonoBehaviour {
                             currentTrampoline += 1;
                             SetLimitText(trampolineLimitText, currentTrampoline, trampolineMax);
                         }
-                        else
-                        {
-                            MaxPrefabsInstantiated(trampolineLimitText);
-                        }
                     }
                     else if (menuObjectHovering.name == "MenuSpectatorCamera")
                     {
@@ -120,10 +108,11 @@ public class ObjectMenuSelector : MonoBehaviour {
                             prefab = GameObject.Instantiate(menuObjectPrefabs[4]);
                             currentSpectatorCamera += 1;
                             SetLimitText(spectatorCameraLimitText, currentSpectatorCamera, spectatorCameraMax);
-                        }
-                        else
-                        {
-                            MaxPrefabsInstantiated(spectatorCameraLimitText);
+
+                            if (OnSpectatorCameraInstantiated != null)
+                            {
+                                OnSpectatorCameraInstantiated();
+                            }
                         }
                     }
                     else
@@ -148,6 +137,7 @@ public class ObjectMenuSelector : MonoBehaviour {
         SetLimitText(woodPlankLimitText, currentWoodPlank, woodPlankMax);
         SetLimitText(fanBodyLimitText, currentFan, fanMax);
         SetLimitText(trampolineLimitText, currentTrampoline, trampolineMax);
+        SetLimitText(spectatorCameraLimitText, currentSpectatorCamera, spectatorCameraMax);
     }
 
     private void SetLimitText(Text limitText, int current, int max)
@@ -173,10 +163,5 @@ public class ObjectMenuSelector : MonoBehaviour {
         prefab.transform.SetParent(leftHand.transform);
         prefab.transform.localPosition = Vector3.zero;
         prefab.transform.rotation = leftHand.transform.rotation;
-    }
-
-    private void MaxPrefabsInstantiated(Text text)
-    {
-        Debug.Log("max prefabs instantiated");
     }
 }

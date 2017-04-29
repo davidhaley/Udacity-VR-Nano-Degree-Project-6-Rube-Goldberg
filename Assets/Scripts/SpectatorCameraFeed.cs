@@ -5,38 +5,58 @@ using UnityEngine;
 
 public class SpectatorCameraFeed : MonoBehaviour {
 
-    public GameObject spectatorCamera;
+    public GameObject spectatorCameraFeed;
+    public GameObject noCameraCanvasHolder;
+
+    private bool spectatorCameraExists = false;
 
     private void Awake()
     {
-        if (spectatorCamera.gameObject.activeSelf)
+        if (spectatorCameraFeed.gameObject.activeSelf)
         {
-            spectatorCamera.gameObject.SetActive(false);
+            spectatorCameraFeed.gameObject.SetActive(false);
+        }
+
+        if (noCameraCanvasHolder.gameObject.activeSelf)
+        {
+            noCameraCanvasHolder.gameObject.SetActive(false);
         }
     }
 
     private void OnEnable()
     {
+        ObjectMenuSelector.OnSpectatorCameraInstantiated += OnSpectatorCameraInstantiated;
         SteamVRControllerEvents.OnGripDown += OnGripDown;
         SteamVRControllerEvents.OnGripUp += OnGripUp;
+    }
+
+    private void OnSpectatorCameraInstantiated()
+    {
+        spectatorCameraExists = true;
     }
 
     private void OnGripDown(SteamVRControllerEvents.ControllerEventArgs e)
     {
         if (e.fixedHandOrientation == "Left")
         {
-            Debug.Log("left grip down");
-            spectatorCamera.gameObject.SetActive(true);
+            if (!spectatorCameraExists)
+            {
+                noCameraCanvasHolder.gameObject.SetActive(true);
+            }
+            else
+            {
+                noCameraCanvasHolder.gameObject.SetActive(false);
+            }
+
+            spectatorCameraFeed.gameObject.SetActive(true);
         }
     }
 
     private void OnGripUp(SteamVRControllerEvents.ControllerEventArgs e)
     {
-        Debug.Log("left grip down");
-
         if (e.fixedHandOrientation == "Left")
         {
-            spectatorCamera.gameObject.SetActive(false);
+            spectatorCameraFeed.gameObject.SetActive(false);
         }
     }
 }
