@@ -33,6 +33,7 @@ public class Ball : MonoBehaviour {
     private Rigidbody rigidBody;
     private Vector3 resetPosition;
     private Vector3 resetVelocity;
+    private Vector3 resetAngularVelocity;
     private Vector3 velocity;
 
     private bool ballWithinPlatformBounds;
@@ -54,7 +55,6 @@ public class Ball : MonoBehaviour {
     private void Awake()
     {
         InitializeBall();
-        rigidBody = gameObject.GetComponent<Rigidbody>();
 
         audioMixer = Resources.Load("MasterMixer") as AudioMixer;
     }
@@ -191,8 +191,11 @@ public class Ball : MonoBehaviour {
 
     private void InitializeBall()
     {
+        rigidBody = gameObject.GetComponent<Rigidbody>();
+
         resetPosition = transform.position;
-        resetVelocity = gameObject.GetComponent<Rigidbody>().velocity;
+        resetVelocity = rigidBody.velocity;
+        resetAngularVelocity = rigidBody.angularVelocity;
 
         ballActiveMaterial = Resources.Load<Material>("Materials/BallActive");
         ballInactiveMaterial = Resources.Load<Material>("Materials/BallInactive");
@@ -203,6 +206,8 @@ public class Ball : MonoBehaviour {
     {
         gameObject.transform.position = resetPosition;
         rigidBody.velocity = resetVelocity;
+        rigidBody.angularVelocity = resetAngularVelocity;
+
         StopAudioSources();
 
         // Keep ball deactivated if player holds onto structure as ball resets
