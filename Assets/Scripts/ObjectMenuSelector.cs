@@ -15,11 +15,13 @@ public class ObjectMenuSelector : MonoBehaviour {
     public Text woodPlankLimitText;
     public Text fanBodyLimitText;
     public Text trampolineLimitText;
+    public Text spectatorCameraLimitText;
 
     public int metalPlankMax;
     public int woodPlankMax;
     public int fanMax;
     public int trampolineMax;
+    public int spectatorCameraMax;
 
     private GameObject menuObjectHovering;
     private GameObject prefab;
@@ -29,6 +31,7 @@ public class ObjectMenuSelector : MonoBehaviour {
     private int currentWoodPlank = 0;
     private int currentFan = 0;
     private int currentTrampoline = 0;
+    private int currentSpectatorCamera = 0;
 
     private void Awake()
     {
@@ -108,6 +111,19 @@ public class ObjectMenuSelector : MonoBehaviour {
                         else
                         {
                             MaxPrefabsInstantiated(trampolineLimitText);
+                        }
+                    }
+                    else if (menuObjectHovering.name == "MenuSpectatorCamera")
+                    {
+                        if (currentSpectatorCamera + 1 <= spectatorCameraMax)
+                        {
+                            prefab = GameObject.Instantiate(menuObjectPrefabs[4]);
+                            currentSpectatorCamera += 1;
+                            SetLimitText(spectatorCameraLimitText, currentSpectatorCamera, spectatorCameraMax);
+                        }
+                        else
+                        {
+                            MaxPrefabsInstantiated(spectatorCameraLimitText);
                         }
                     }
                     else
