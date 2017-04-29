@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Valve.VR.InteractionSystem;
@@ -35,12 +31,12 @@ public class LevelLoader : MonoBehaviour {
 
         levels = new List<int>();
 
-        for (int i = 0; i < EditorSceneManager.loadedSceneCount; i++)
+        for (int i = 0; i < UnityEditor.SceneManagement.EditorSceneManager.loadedSceneCount; i++)
         {
             levels.Add(i);
         }
 
-        currentLevel = Convert.ToInt32(EditorSceneManager.GetActiveScene().name);
+        currentLevel = Convert.ToInt32(UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene().name);
         nextLevel = currentLevel + 1;
         lastLevel = levels.Count - 1;
     }

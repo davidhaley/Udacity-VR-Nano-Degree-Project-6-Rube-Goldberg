@@ -18,8 +18,11 @@ public class MusicController : MonoBehaviour {
         level2 = Resources.Load<AudioClip>("Sounds/Music/Roll Your Own");
         level3 = Resources.Load<AudioClip>("Sounds/Music/Cosmopolitan Drink");
         level4 = Resources.Load<AudioClip>("Sounds/Music/Head Down (Jay P Mix)");
+    }
 
-        if (audioSource.clip == null && EditorSceneManager.GetActiveScene().name == "1")
+    private void Start()
+    {
+        if (audioSource.clip == null && UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "1")
         {
             Change(1);
         }

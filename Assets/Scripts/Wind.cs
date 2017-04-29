@@ -20,7 +20,7 @@ public class Wind : MonoBehaviour {
 
     private bool ballInWindZone;
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (ball != null)
         {

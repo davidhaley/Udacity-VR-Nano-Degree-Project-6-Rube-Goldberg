@@ -26,6 +26,7 @@ public class ScoreManager : MonoBehaviour {
 
     private void Awake()
     {
+        DontDestroyOnLoad(this.gameObject);
         AddTextsToList();
     }
 
@@ -41,6 +42,7 @@ public class ScoreManager : MonoBehaviour {
 
     public void IncreaseScore()
     {
+        Debug.Log("increasing score");
         score += incrementScoreBy;
         SetScore();
     }
@@ -63,6 +65,8 @@ public class ScoreManager : MonoBehaviour {
 
     private void SetScore()
     {
+        Debug.Log("setting score");
+
         currentScore.text = score.ToString() + " of";
     }
 

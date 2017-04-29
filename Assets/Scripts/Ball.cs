@@ -30,8 +30,10 @@ public class Ball : MonoBehaviour {
     private AudioSource trampolineAudioSource;
     private AudioSource metalPlankAudioSource;
 
+    private Rigidbody rigidBody;
     private Vector3 resetPosition;
     private Vector3 resetVelocity;
+    private Vector3 velocity;
 
     private bool ballWithinPlatformBounds;
     private Renderer ballRenderer;
@@ -52,6 +54,7 @@ public class Ball : MonoBehaviour {
     private void Awake()
     {
         InitializeBall();
+        rigidBody = gameObject.GetComponent<Rigidbody>();
 
         audioMixer = Resources.Load("MasterMixer") as AudioMixer;
     }
@@ -63,12 +66,22 @@ public class Ball : MonoBehaviour {
         LoadMetalPlankAudio();
     }
 
+    private void FixedUpdate()
+    {
+        velocity = rigidBody.velocity;
+    }
+
     private void Update()
     {
         if (structureAttachedToHand && !ballWithinPlatformBounds)
         {
             DeactivateBall();
         }
+    }
+
+    public Vector3 GetVelocity
+    {
+        get { return velocity; }
     }
 
     // Ball attached to hand
@@ -151,6 +164,11 @@ public class Ball : MonoBehaviour {
         {
             ballWithinPlatformBounds = true;
         }
+        else if (col.gameObject.CompareTag("TeleportTarget"))
+        {
+            Teleporter teleporter = col.gameObject.GetComponent<Teleporter>();
+            teleporter.Teleport(gameObject);
+        }
     }
 
     private void OnTriggerExit(Collider col)
@@ -184,7 +202,7 @@ public class Ball : MonoBehaviour {
     private void ResetBall()
     {
         gameObject.transform.position = resetPosition;
-        gameObject.transform.GetComponent<Rigidbody>().velocity = resetVelocity;
+        rigidBody.velocity = resetVelocity;
         StopAudioSources();
 
         // Keep ball deactivated if player holds onto structure as ball resets
@@ -268,6 +286,7 @@ public class Ball : MonoBehaviour {
 
         metalPlankAudioSource = metalPlankAudio.GetComponent<AudioSource>();
         metalPlankAudioSource.playOnAwake = false;
+        metalPlankAudioSource.volume = 0.70f;
         metalPlankAudioSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Effects")[0];
 
         LoadPhononEffect(metalPlankAudio);

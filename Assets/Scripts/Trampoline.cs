@@ -1,25 +1,35 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Trampoline : MonoBehaviour {
 
-    public float velocityMultiplier = 2f;
-    public float bounceMultiplier = 2f;
+    public float magnitude;
+    public float maxUpwardVelocity;
+    public float upwardVelocity;
+    private Rigidbody rigidBody;
 
-    private void OnCollisionEnter(Collision col)
+    private void OnCollisionEnter(Collision collision)
     {
-        if (col.gameObject.CompareTag("Ball"))
+        if (collision.gameObject.CompareTag("Ball"))
         {
-            Bounce(col.gameObject);
+            Ball ball = collision.gameObject.GetComponent<Ball>();
+
+            Bounce(ball.gameObject, ball.GetVelocity);
         }
     }
 
-    private void Bounce(GameObject gameObject)
+    private void Bounce(GameObject gameObject, Vector3 vel)
     {
-        Rigidbody rigidBody = gameObject.GetComponent<Rigidbody>();
+        rigidBody = gameObject.GetComponent<Rigidbody>();
+        upwardVelocity = Math.Abs(vel.y);
 
-        rigidBody.angularVelocity *= velocityMultiplier;
-        rigidBody.AddForce(0, bounceMultiplier, 0, ForceMode.Impulse);
+        if (upwardVelocity >= maxUpwardVelocity)
+        {
+            upwardVelocity = maxUpwardVelocity;
+        }
+
+        rigidBody.AddForce(transform.forward * upwardVelocity * magnitude, ForceMode.Impulse);
     }
 }
