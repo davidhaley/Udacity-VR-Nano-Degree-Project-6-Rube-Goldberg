@@ -9,8 +9,7 @@ using UnityEngine.UI;
 public class ScoreManager : MonoBehaviour {
 
     public Text description;
-    public Text currentScore;
-    public Text totalScore;
+    public Text scoreText;
     public Text win;
     public Text timeElapsed;
 
@@ -54,7 +53,6 @@ public class ScoreManager : MonoBehaviour {
 
     public void IncreaseScore()
     {
-        Debug.Log("increasing score");
         score += incrementScoreBy;
         SetScore();
     }
@@ -64,22 +62,17 @@ public class ScoreManager : MonoBehaviour {
         ActivateTexts();
         win.gameObject.SetActive(false);
 
-        currentScore.text = "";
-        totalScore.text = "";
+        scoreText.text = System.String.Empty;
         description.text = "Stars Collected:";
 
         score = 0;
-
-        currentScore.text = score.ToString() + " of";
+        SetScore();
         CollectablesManager.ResetCollectables();
-        totalScore.text = CollectablesManager.CollectablesRemaining().ToString();
     }
 
     private void SetScore()
     {
-        Debug.Log("setting score");
-
-        currentScore.text = score.ToString() + " of";
+        scoreText.text = (score + " of " + CollectablesManager.CollectablesRemaining()).ToString();
     }
 
     private void Win()
@@ -116,8 +109,7 @@ public class ScoreManager : MonoBehaviour {
         texts = new List<Text>();
 
         texts.Add(description);
-        texts.Add(currentScore);
-        texts.Add(totalScore);
+        texts.Add(scoreText);
     }
 
     private void DeactivateTexts()
