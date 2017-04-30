@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class Teleporter : MonoBehaviour {
 
-    public GameObject teleportDestination;
+    public GameObject teleportDestinationGo;
 
     private AudioSource teleportTargetAudioSource;
     private AudioSource teleportDestinationAudioSource;
@@ -15,12 +15,14 @@ public class Teleporter : MonoBehaviour {
     private GameObject teleportingObject;
     private Vector3 destination;
 
+    private TeleportDestination teleportDestination;
+
     private void Awake()
     {
-        destination = teleportDestination.transform.position;
+        teleportDestination = teleportDestinationGo.GetComponent<TeleportDestination>();
 
         teleportTargetAudioSource = gameObject.GetComponent<AudioSource>();
-        teleportDestinationAudioSource = teleportDestination.GetComponent<AudioSource>();
+        teleportDestinationAudioSource = teleportDestinationGo.GetComponent<AudioSource>();
     }
 
     public void Teleport(GameObject go)
@@ -38,7 +40,7 @@ public class Teleporter : MonoBehaviour {
         teleportDestinationAudioSource.Play();
         go.SetActive(true);
 
-        go.transform.position = destination;
-        rigidBody.velocity = teleportDestination.transform.forward * rigidBody.velocity.magnitude;
+        go.transform.position = teleportDestinationGo.transform.position;
+        rigidBody.velocity = teleportDestinationGo.transform.forward * rigidBody.velocity.magnitude;
     }
 }
