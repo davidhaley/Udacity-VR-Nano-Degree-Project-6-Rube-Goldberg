@@ -2,16 +2,38 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SpectatorCameraFeed : MonoBehaviour {
 
-    public GameObject spectatorCameraFeed;
-    public GameObject noCameraCanvasHolder;
+    private GameObject spectatorCameraFeed;
+    private GameObject noCameraCanvasHolder;
 
     private bool spectatorCameraExists = false;
 
     private void Awake()
     {
+        //spectatorCameraFeed = gameObject.transform.Find("SpectatorCameraFeed").gameObject;
+        //noCameraCanvasHolder = gameObject.transform.Find("NoCameraCanvasHolder").gameObject;
+        InitializeGameObjects();
+
+    }
+
+    private void InitializeGameObjects()
+    {
+        Transform[] transforms = gameObject.GetComponentsInChildren<Transform>(true);
+        foreach (Transform t in transforms)
+        {
+            if (t.name == "SpectatorCameraFeed")
+            {
+                spectatorCameraFeed = t.gameObject;
+            }
+            else if (t.name == "NoCameraCanvasHolder")
+            {
+                noCameraCanvasHolder = t.gameObject;
+            }
+        }
+
         if (spectatorCameraFeed.gameObject.activeSelf)
         {
             spectatorCameraFeed.gameObject.SetActive(false);
@@ -21,6 +43,9 @@ public class SpectatorCameraFeed : MonoBehaviour {
         {
             noCameraCanvasHolder.gameObject.SetActive(false);
         }
+
+        Debug.Log("inside intialize: " + noCameraCanvasHolder);
+
     }
 
     private void OnEnable()
@@ -29,6 +54,20 @@ public class SpectatorCameraFeed : MonoBehaviour {
         SteamVRControllerEvents.OnGripDown += OnGripDown;
         SteamVRControllerEvents.OnGripUp += OnGripUp;
     }
+
+    private void OnDisable()
+    {
+        ObjectMenuSelector.OnSpectatorCameraInstantiated -= OnSpectatorCameraInstantiated;
+        SteamVRControllerEvents.OnGripDown -= OnGripDown;
+        SteamVRControllerEvents.OnGripUp -= OnGripUp;
+    }
+
+    //private void OnLevelFinishedLoading(Scene scene, LoadSceneMode loadSceneMode)
+    //{
+    //    Debug.Log("inside on level finished loading: " + noCameraCanvasHolder);
+
+    //    InitializeGameObjects();
+    //}
 
     private void OnSpectatorCameraInstantiated()
     {

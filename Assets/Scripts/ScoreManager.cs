@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,9 +12,14 @@ public class ScoreManager : MonoBehaviour {
     public Text currentScore;
     public Text totalScore;
     public Text win;
+    public Text timeElapsed;
 
     public int incrementScoreBy = 1;
     private int score = 0;
+
+    private DateTime startTime;
+    private TimeSpan elapsedTime;
+    private String displayTime;
 
     private List<Text> texts;
 
@@ -33,12 +39,18 @@ public class ScoreManager : MonoBehaviour {
     void Start()
     {
         InitializeScore();
+
+        startTime = DateTime.Now;
     }
 
-    //public int CurrentScore
-    //{
-    //    get { return score; }
-    //}
+    private void LateUpdate()
+    {
+        elapsedTime = DateTime.Now - startTime;
+
+        displayTime = String.Format("{0:00}:{1:00}", elapsedTime.Minutes, elapsedTime.Seconds);
+
+        timeElapsed.text = displayTime;
+    }
 
     public void IncreaseScore()
     {

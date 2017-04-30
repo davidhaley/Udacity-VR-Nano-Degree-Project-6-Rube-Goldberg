@@ -208,7 +208,8 @@ public class Ball : MonoBehaviour {
         rigidBody.velocity = resetVelocity;
         rigidBody.angularVelocity = resetAngularVelocity;
 
-        StopAudioSources();
+        // Longest looping sound (prevents overlap after ball resets)
+        StopAudioSource(metalPlankAudioSource);
 
         // Keep ball deactivated if player holds onto structure as ball resets
         if (structureAttachedToHand)
@@ -233,12 +234,12 @@ public class Ball : MonoBehaviour {
         ballActive = true;
     }
 
-    private void StopAudioSources()
+    private void StopAudioSource(AudioSource audioSource)
     {
-        collectableAudioSource.Stop();
-        metalPlankAudioSource.Stop();
-        trampolineAudioSource.Stop();
-        //woodPlankAudio.Stop();
+        if (audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
     }
 
     private void LoadCollectableAudio()
@@ -249,9 +250,11 @@ public class Ball : MonoBehaviour {
 
         collectablePlaySound = collectableAudio.AddComponent<PlaySound>();
         collectablePlaySound.waveFile = clips;
+        collectablePlaySound.useRandomVolume = false;
 
         collectableAudioSource = collectableAudio.GetComponent<AudioSource>();
         collectableAudioSource.playOnAwake = false;
+        collectableAudioSource.volume = 0.30f;
         collectableAudioSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Effects")[0];
 
         LoadPhononEffect(collectableAudio);
@@ -273,6 +276,7 @@ public class Ball : MonoBehaviour {
 
         trampolineAudioSource = trampolineAudio.GetComponent<AudioSource>();
         trampolineAudioSource.playOnAwake = false;
+        trampolineAudioSource.volume = 0.50f;
         trampolineAudioSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Effects")[0];
 
         LoadPhononEffect(trampolineAudio);
@@ -291,7 +295,7 @@ public class Ball : MonoBehaviour {
 
         metalPlankAudioSource = metalPlankAudio.GetComponent<AudioSource>();
         metalPlankAudioSource.playOnAwake = false;
-        metalPlankAudioSource.volume = 0.70f;
+        metalPlankAudioSource.volume = 0.25f;
         metalPlankAudioSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Effects")[0];
 
         LoadPhononEffect(metalPlankAudio);

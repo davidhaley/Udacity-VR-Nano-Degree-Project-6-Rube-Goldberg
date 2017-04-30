@@ -174,11 +174,11 @@ public class Fan : MonoBehaviour
         fanSwitchOff = Resources.Load<AudioClip>("Sounds/Fan/FanSwitchOff");
 
         audioSourceFan.loop = true;
-        audioSourceFan.volume = 0.80f;
+        audioSourceFan.volume = 0.30f;
         audioSourceFan.playOnAwake = false;
 
         audioSourceSwitch.loop = false;
-        audioSourceSwitch.volume = 0.80f;
+        audioSourceSwitch.volume = 0.20f;
         audioSourceSwitch.playOnAwake = false;
     }
 
