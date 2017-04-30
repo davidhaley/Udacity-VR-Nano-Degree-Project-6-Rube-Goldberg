@@ -42,6 +42,16 @@ public class ObjectMenuSelector : MonoBehaviour {
         InitializeLimitTexts();
     }
 
+    private void OnEnable()
+    {
+        SteamVRControllerEvents.OnGripDown += OnGripDown;
+    }
+
+    private void OnDisable()
+    {
+        SteamVRControllerEvents.OnGripDown -= OnGripDown;
+    }
+
     private void Update()
     {
         leftHand = Player.instance.hands[(int)Hand.HandType.Left];
@@ -109,6 +119,8 @@ public class ObjectMenuSelector : MonoBehaviour {
                             currentSpectatorCamera += 1;
                             SetLimitText(spectatorCameraLimitText, currentSpectatorCamera, spectatorCameraMax);
 
+                            ControllerButtonHints.ShowTextHint(leftHand, Valve.VR.EVRButtonId.k_EButton_Grip, "View Camera Feed", true);
+
                             if (OnSpectatorCameraInstantiated != null)
                             {
                                 OnSpectatorCameraInstantiated();
@@ -128,6 +140,14 @@ public class ObjectMenuSelector : MonoBehaviour {
                 }
             }
 
+        }
+    }
+
+    private void OnGripDown(SteamVRControllerEvents.ControllerEventArgs e)
+    {
+        if (currentSpectatorCamera >= 1 && e.fixedHandOrientation == "Left")
+        {
+            ControllerButtonHints.HideTextHint(leftHand, Valve.VR.EVRButtonId.k_EButton_Grip);
         }
     }
 

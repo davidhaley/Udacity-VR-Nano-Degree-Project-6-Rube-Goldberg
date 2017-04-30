@@ -29,9 +29,15 @@ public class ScoreManager : MonoBehaviour {
         Ball.ballTouchedGoal += OnBallTouchedGoal;
     }
 
+    private void OnDisable()
+    {
+        Ball.ballTouchedGround -= OnBallTouchedGround;
+        Ball.ballTouchedCollectable -= OnBallTouchedCollectable;
+        Ball.ballTouchedGoal -= OnBallTouchedGoal;
+    }
+
     private void Awake()
     {
-        DontDestroyOnLoad(this.gameObject);
         AddTextsToList();
     }
 
@@ -66,13 +72,13 @@ public class ScoreManager : MonoBehaviour {
         description.text = "Stars Collected:";
 
         score = 0;
-        SetScore();
         CollectablesManager.ResetCollectables();
+        SetScore();
     }
 
     private void SetScore()
     {
-        scoreText.text = (score + " of " + CollectablesManager.CollectablesRemaining()).ToString();
+        scoreText.text = (score + " of " + CollectablesManager.collectables.Length.ToString());
     }
 
     private void Win()

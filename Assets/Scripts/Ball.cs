@@ -9,6 +9,9 @@ using Valve.VR.InteractionSystem;
 
 public class Ball : MonoBehaviour {
 
+    public float maxPitchCollectable;
+    public float minPitchCollectable;
+
     public delegate void BallTouchedGround();
     public delegate void BallTouchedGoal();
     public delegate void BallTouchedCollectable();
@@ -153,6 +156,16 @@ public class Ball : MonoBehaviour {
     {
         if (col.gameObject.CompareTag("Collectable") && ballActive)
         {
+            int numberOfCollectablesPickedUp = CollectablesManager.collectables.Length - CollectablesManager.CollectablesRemaining();
+            float pitchIncrement = (maxPitchCollectable - minPitchCollectable) / CollectablesManager.collectables.Length;
+            float currentPitch = minPitchCollectable + (numberOfCollectablesPickedUp * pitchIncrement);
+
+            if (currentPitch <= 0)
+            {
+                currentPitch = minPitchCollectable;
+            }
+
+            collectableAudioSource.pitch = currentPitch;
             collectablePlaySound.Play();
 
             col.gameObject.SetActive(false);
@@ -263,6 +276,7 @@ public class Ball : MonoBehaviour {
         collectablePlaySound = collectableAudio.AddComponent<PlaySound>();
         collectablePlaySound.waveFile = clips;
         collectablePlaySound.useRandomVolume = false;
+        collectablePlaySound.useRandomPitch = false;
 
         collectableAudioSource = collectableAudio.GetComponent<AudioSource>();
         collectableAudioSource.playOnAwake = false;
