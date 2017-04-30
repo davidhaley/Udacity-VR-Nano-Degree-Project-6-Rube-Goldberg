@@ -184,7 +184,11 @@ namespace Valve.VR.InteractionSystem
 
 			CheckForSpawnPoint();
 
-			Invoke( "ShowTeleportHint", 5.0f );
+            // Show teleport hint on first level only
+            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "1")
+            {
+                Invoke("ShowTeleportHint", 5.0f);
+            }
 
             teleportHand = Valve.VR.InteractionSystem.Player.instance.leftHand;
         }
