@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Audio;
 using Valve.VR.InteractionSystem;
 
-// Purpose: Announce ball collisions, play sounds, and reset ball to start position when it touches the ground
+// Purpose: Handle collision logic for ball, play sounds, and reset ball to start position when it touches the ground
 
 public class Ball : MonoBehaviour {
 
@@ -45,6 +45,7 @@ public class Ball : MonoBehaviour {
     private bool structureAttachedToHand;
 
     AudioMixer audioMixer;
+    private List<AudioSource> audioSources;
 
     private void OnEnable()
     {
@@ -57,6 +58,7 @@ public class Ball : MonoBehaviour {
         InitializeBall();
 
         audioMixer = Resources.Load("MasterMixer") as AudioMixer;
+        audioSources = new List<AudioSource>();
     }
 
     private void Start()
@@ -208,8 +210,7 @@ public class Ball : MonoBehaviour {
         rigidBody.velocity = resetVelocity;
         rigidBody.angularVelocity = resetAngularVelocity;
 
-        // Longest looping sound (prevents overlap after ball resets)
-        StopAudioSource(metalPlankAudioSource);
+        StopAudioSources();
 
         // Keep ball deactivated if player holds onto structure as ball resets
         if (structureAttachedToHand)
@@ -219,6 +220,17 @@ public class Ball : MonoBehaviour {
         else
         {
             ActivateBall();
+        }
+    }
+
+    private void StopAudioSources()
+    {
+        foreach (AudioSource audioSource in audioSources)
+        {
+            if (audioSource.isPlaying)
+            {
+                audioSource.Stop();
+            }
         }
     }
 
@@ -256,6 +268,7 @@ public class Ball : MonoBehaviour {
         collectableAudioSource.playOnAwake = false;
         collectableAudioSource.volume = 0.30f;
         collectableAudioSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Effects")[0];
+        audioSources.Add(collectableAudioSource);
 
         LoadPhononEffect(collectableAudio);
     }
@@ -278,6 +291,7 @@ public class Ball : MonoBehaviour {
         trampolineAudioSource.playOnAwake = false;
         trampolineAudioSource.volume = 0.50f;
         trampolineAudioSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Effects")[0];
+        audioSources.Add(trampolineAudioSource);
 
         LoadPhononEffect(trampolineAudio);
     }
@@ -297,6 +311,7 @@ public class Ball : MonoBehaviour {
         metalPlankAudioSource.playOnAwake = false;
         metalPlankAudioSource.volume = 0.25f;
         metalPlankAudioSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Effects")[0];
+        audioSources.Add(metalPlankAudioSource);
 
         LoadPhononEffect(metalPlankAudio);
     }
