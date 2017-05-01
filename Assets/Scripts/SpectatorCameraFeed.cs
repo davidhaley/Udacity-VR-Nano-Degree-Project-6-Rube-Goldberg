@@ -43,9 +43,6 @@ public class SpectatorCameraFeed : MonoBehaviour {
         {
             noCameraCanvasHolder.gameObject.SetActive(false);
         }
-
-        Debug.Log("inside intialize: " + noCameraCanvasHolder);
-
     }
 
     private void OnEnable()
