@@ -1,4 +1,5 @@
 ﻿using MusicLab.InteractionSystem;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,7 +9,14 @@ using Valve.VR.InteractionSystem;
 
 public class Introduction : MonoBehaviour {
 
-    public Text introduction;
+    public Text instructions;
+
+    private Dictionary<int, string> instructionDict;
+    private Dictionary<int, IEnumerator> coroutineDict;
+
+    private string actionColor = "<color=olive>";
+    private string buttonColor = "<color=orange>";
+    private string outcomeColor = "<color=blue>";
 
     private Valve.VR.EVRButtonId touchpad = Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad;
     private Valve.VR.EVRButtonId trigger = Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger;
@@ -34,15 +42,18 @@ public class Introduction : MonoBehaviour {
 
     private void Awake()
     {
-        if (introduction.gameObject.activeSelf == false)
+        CreatePlayerInstructions();
+        CreateCoroutines();
+
+        if (instructions.gameObject.activeSelf == false)
         {
-            introduction.gameObject.SetActive(true);
+            instructions.gameObject.SetActive(true);
         }
     }
 
     private void Start()
     {
-        StartCoroutine(BeginHintSequence());
+        StartCoroutine(BeginHintSequence(hintCounter));
     }
 
     private void Update()
@@ -56,30 +67,60 @@ public class Introduction : MonoBehaviour {
             else
             {
                 hintCounter += 1;
-                StartCoroutine(BeginHintSequence());
+                StartCoroutine(BeginHintSequence(hintCounter));
             }
         }
     }
 
-    private IEnumerator BeginHintSequence()
+    private void CreatePlayerInstructions()
     {
-        if (hintCounter == 0)
-        {
-            hintCoroutine = StartCoroutine(ShowObjectMenuHint());
-        }
-        else if (hintCounter == 1)
-        {
-            hintCoroutine = StartCoroutine(CycleObjectMenuHint());
-        }
-        else if (hintCounter == 2)
-        {
-            hintCoroutine = StartCoroutine(GrabObjectHint());
-        }
-        else if (hintCounter == 3)
-        {
-            hintCoroutine = StartCoroutine(TeleportHint());
-        }
+        instructionDict = new Dictionary<int, string>();
 
+        string instruction1 = "Gently " + actionColor + "TOUCH</color> the " + buttonColor + "[RIGHT TOUCHPAD]</color> to show your " + outcomeColor + " OBJECT MENU</color>.";
+        string instruction2 = outcomeColor + "CYCLE</color> through your object menu, by " + actionColor + "PRESSING LEFT or RIGHT</color> on the " + buttonColor + "[RIGHT TOUCHPAD]</color>";
+        string instruction3 = "To " + outcomeColor + "CREATE</color> an object from your menu, hover over the object with your left hand, and " + actionColor + "PRESS</color> the " + buttonColor + "[LEFT TRIGGER]</color>." + "\n\n<size=120><color=yellow>Caution: You only have a limited number of objects available!</color></size>";
+        string instruction4 = "You can move around your playspace by teleporting. " + actionColor + "HOLD</color> the " + buttonColor + "[LEFT TOUCHPAD]</color> to aim, and " + actionColor + "RELEASE</color> the " + buttonColor + "[LEFT TOUCHPAD]</color> to teleport!";
+        string instruction5 = "Build a contraption using your <color=teal>OBJECTS</color>. Guide the <color=silver>BALL</color> toward the <color=red>GOAL</color>. Collect every <color=yellow>STAR</color> to advance to the next level!";
+        string instruction6 = "<size=200><color=lightblue>LET'S GET STARTED!</color></size>";
+
+        instructionDict.Add(0, instruction1);
+        instructionDict.Add(1, instruction2);
+        instructionDict.Add(2, instruction3);
+        instructionDict.Add(3, instruction4);
+        instructionDict.Add(4, instruction5);
+        instructionDict.Add(5, instruction6);
+    }
+
+    private void CreateCoroutines()
+    {
+        coroutineDict = new Dictionary<int, IEnumerator>();
+
+        coroutineDict.Add(0, ShowObjectMenuHint());
+        coroutineDict.Add(1, CycleObjectMenuHint());
+        coroutineDict.Add(2, GrabObjectHint());
+        coroutineDict.Add(3, TeleportHint());
+    }
+
+    private void ChangeText(Text instructions, int hintCounter)
+    {
+        if (instructionDict.ContainsKey(hintCounter))
+        {
+            instructions.text = instructionDict[hintCounter];
+        }
+    }
+
+    private void ChangeCoroutine(int hintCounter)
+    {
+        if (coroutineDict.ContainsKey(hintCounter))
+        {
+            hintCoroutine = StartCoroutine(coroutineDict[hintCounter]);
+        }
+    }
+
+    private IEnumerator BeginHintSequence(int hintCounter)
+    {
+        ChangeCoroutine(hintCounter);
+        ChangeText(instructions, hintCounter);
         yield return null;
     }
 
