@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 52e38a7703405f649876c8240f84b394
+timeCreated: 1493689921
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: ITC Machine Std
+  fontNames:
+  - ITC Machine Std
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
