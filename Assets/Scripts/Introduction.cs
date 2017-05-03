@@ -6,25 +6,31 @@ using UnityEngine;
 using UnityEngine.UI;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
+using System.Collections.Specialized;
 
 public class Introduction : MonoBehaviour {
 
     public Text instructions;
 
-    private Dictionary<int, string> instructionDict;
-    private Dictionary<int, IEnumerator> coroutineDict;
+    private OrderedDictionary hintDict;
 
-    private string actionColor = "<color=olive>";
-    private string buttonColor = "<color=orange>";
-    private string outcomeColor = "<color=blue>";
+    private FadeCanvas fadeCanvas;
 
     private Valve.VR.EVRButtonId touchpad = Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad;
     private Valve.VR.EVRButtonId trigger = Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger;
 
-    private Coroutine hintCoroutine;
     private int hintCounter = 0;
     private bool finishedHints = false;
-    private bool cycleMenuHintActive;
+
+    private Coroutine hintCoroutine;
+    private Coroutine controllerHintCoroutine;
+    private Coroutine instructionHintCoroutine;
+
+    private bool cycleMenuHintActive = false;
+    private string actionColor = "<color=olive>";
+    private string buttonColor = "<color=orange>";
+    private string outcomeColor = "<color=blue>";
+
 
     private void OnEnable()
     {
@@ -42,8 +48,12 @@ public class Introduction : MonoBehaviour {
 
     private void Awake()
     {
-        CreatePlayerInstructions();
-        CreateCoroutines();
+        hintDict = new OrderedDictionary();
+
+        AddCoroutinesToList();
+
+
+        fadeCanvas = GetComponent<FadeCanvas>();
 
         if (instructions.gameObject.activeSelf == false)
         {
@@ -58,69 +68,80 @@ public class Introduction : MonoBehaviour {
 
     private void Update()
     {
-        if (hintCoroutine == null && !finishedHints)
+        if (controllerHintCoroutine == null && instructionHintCoroutine == null)
         {
-            if (hintCounter + 1 >= 5)
+            hintCoroutine = null;
+        }
+
+        Debug.Log("Hint coroutine is null: " + hintCoroutine == null);
+        Debug.Log("Instruction coroutine is null: " + instructionHintCoroutine == null);
+        Debug.Log("Controller coroutine is null: " + controllerHintCoroutine == null);
+
+        if (hintCoroutine == null)
+        {
+            if (hintCounter <= hintDict.Keys.Count)
             {
-                finishedHints = true;
-            }
-            else
-            {
+                Debug.Log("incrementing counter at: " + Time.time);
                 hintCounter += 1;
                 StartCoroutine(BeginHintSequence(hintCounter));
             }
         }
     }
 
-    private void CreatePlayerInstructions()
-    {
-        instructionDict = new Dictionary<int, string>();
-
-        string instruction1 = "Gently " + actionColor + "TOUCH</color> the " + buttonColor + "[RIGHT TOUCHPAD]</color> to show your " + outcomeColor + " OBJECT MENU</color>.";
-        string instruction2 = outcomeColor + "CYCLE</color> through your object menu, by " + actionColor + "PRESSING LEFT or RIGHT</color> on the " + buttonColor + "[RIGHT TOUCHPAD]</color>";
-        string instruction3 = "To " + outcomeColor + "CREATE</color> an object from your menu, hover over the object with your left hand, and " + actionColor + "PRESS</color> the " + buttonColor + "[LEFT TRIGGER]</color>." + "\n\n<size=120><color=yellow>Caution: You only have a limited number of objects available!</color></size>";
-        string instruction4 = "You can move around your playspace by teleporting. " + actionColor + "HOLD</color> the " + buttonColor + "[LEFT TOUCHPAD]</color> to aim, and " + actionColor + "RELEASE</color> the " + buttonColor + "[LEFT TOUCHPAD]</color> to teleport!";
-        string instruction5 = "Build a contraption using your <color=teal>OBJECTS</color>. Guide the <color=silver>BALL</color> toward the <color=red>GOAL</color>. Collect every <color=yellow>STAR</color> to advance to the next level!";
-        string instruction6 = "<size=200><color=lightblue>LET'S GET STARTED!</color></size>";
-
-        instructionDict.Add(0, instruction1);
-        instructionDict.Add(1, instruction2);
-        instructionDict.Add(2, instruction3);
-        instructionDict.Add(3, instruction4);
-        instructionDict.Add(4, instruction5);
-        instructionDict.Add(5, instruction6);
-    }
-
-    private void CreateCoroutines()
-    {
-        coroutineDict = new Dictionary<int, IEnumerator>();
-
-        coroutineDict.Add(0, ShowObjectMenuHint());
-        coroutineDict.Add(1, CycleObjectMenuHint());
-        coroutineDict.Add(2, GrabObjectHint());
-        coroutineDict.Add(3, TeleportHint());
-    }
-
-    private void ChangeText(Text instructions, int hintCounter)
-    {
-        if (instructionDict.ContainsKey(hintCounter))
-        {
-            instructions.text = instructionDict[hintCounter];
-        }
-    }
-
-    private void ChangeCoroutine(int hintCounter)
-    {
-        if (coroutineDict.ContainsKey(hintCounter))
-        {
-            hintCoroutine = StartCoroutine(coroutineDict[hintCounter]);
-        }
-    }
-
     private IEnumerator BeginHintSequence(int hintCounter)
     {
-        ChangeCoroutine(hintCounter);
-        ChangeText(instructions, hintCounter);
+        if (hintDict.Contains(hintCounter))
+        {
+            Debug.Log("starting coroutine");
+            hintCoroutine = StartCoroutine(hintDict[hintCounter] as IEnumerator);
+        }
+
+        yield return null;
+    }
+
+    private IEnumerator Hint1()
+    {
+        instructionHintCoroutine = StartCoroutine(ChangeInstructionCoroutine(hintCounter));
+        controllerHintCoroutine = StartCoroutine(ShowObjectMenuHint());
+
+        yield return null;
+    }
+
+    private IEnumerator Hint2()
+    {
+        instructionHintCoroutine = StartCoroutine(ChangeInstructionCoroutine(hintCounter));
+        controllerHintCoroutine = StartCoroutine(CycleObjectMenuHint());
+
+        yield return null;
+    }
+
+    private IEnumerator Hint3()
+    {
+        instructionHintCoroutine = StartCoroutine(ChangeInstructionCoroutine(hintCounter));
+        controllerHintCoroutine = StartCoroutine(GrabObjectHint());
+
+        yield return null;
+    }
+
+    private IEnumerator Hint4()
+    {
+        instructionHintCoroutine = StartCoroutine(ChangeInstructionCoroutine(hintCounter));
+        controllerHintCoroutine = StartCoroutine(TeleportHint());
+
+        yield return null;
+    }
+
+    private IEnumerator Hint5()
+    {
+        instructionHintCoroutine = StartCoroutine(ChangeInstructionCoroutine(hintCounter));
+
+        yield return null;
+    }
+
+    private IEnumerator Hint6()
+    {
+        instructionHintCoroutine = StartCoroutine(ChangeInstructionCoroutine(hintCounter));
+
         yield return null;
     }
 
@@ -161,20 +182,38 @@ public class Introduction : MonoBehaviour {
 
         ShowHint(Player.instance.leftHand, trigger, "Grab Object from Menu");
     }
+
     private IEnumerator TeleportHint()
     {
-        yield return new WaitForSeconds(5f);
-
-        //ShowHint(Player.instance.leftHand, touchpad, "Teleport");
+        yield return new WaitForSeconds(7f);
 
         Teleport.instance.ShowTeleportHint();
         yield return null;
 
     }
 
-    //--------
-    // Events
-    //--------
+    private IEnumerator ChangeInstructionCoroutine(int hintCounter)
+    {
+        // Wait some time before changing the instructions after the player ends the controller hint
+        if (hintCounter > 0)
+        {
+            yield return new WaitForSeconds(7f);
+        }
+
+        CancelInstructionHint(hintCounter);
+        instructions.text = GetPlayerInstructions(hintCounter);
+    }
+
+    public void CancelInstructionHint(int hintCounter)
+    {
+        if (hintCounter > 0 && instructionHintCoroutine != null)
+        {
+            StopCoroutine(instructionHintCoroutine);
+            instructionHintCoroutine = null;
+        }
+
+        CancelInvoke("ChangeInstructionCoroutine");
+    }
 
     private void OnTouchpadTouch(SteamVRControllerEvents.ControllerEventArgs e)
     {
@@ -225,28 +264,74 @@ public class Introduction : MonoBehaviour {
         }
     }
 
-    //---------------------
-    // Hint & Haptic Pulse
-    //---------------------
+    private void FadeCanvas()
+    {
+        fadeCanvas.waitForSeconds = 7f;
+        fadeCanvas.ToggleFade();
+    }
+
+    private string GetPlayerInstructions(int hintCounter)
+    {
+        if (hintCounter == 0)
+        {
+            return "Gently " + actionColor + "TOUCH</color> the " + buttonColor + "[RIGHT TOUCHPAD]</color> to show your " + outcomeColor + " OBJECT MENU</color>.";
+        }
+        else if (hintCounter == 1)
+        {
+            return outcomeColor + "CYCLE</color> through your object menu, by " + actionColor + "PRESSING LEFT or RIGHT</color> on the " + buttonColor + "[RIGHT TOUCHPAD]</color>";
+        }
+        else if (hintCounter == 2)
+        {
+            return outcomeColor + "CREATE</color> an object from your menu, hover over the object with your left hand, and " + actionColor + "PRESS</color> the " + buttonColor + "[LEFT TRIGGER]</color>." + "\n\n<size=120><color=yellow>Caution: You only have a limited number of objects available!</color></size>";
+        }
+        else if (hintCounter == 3)
+        {
+            return "You can move around your playspace by teleporting. " + actionColor + "HOLD</color> the " + buttonColor + "[LEFT TOUCHPAD]</color> to aim, and " + actionColor + "RELEASE</color> the " + buttonColor + "[LEFT TOUCHPAD]</color> to teleport!";
+        }
+        else if (hintCounter == 4)
+        {
+            return "<color=red>OBJECTIVE:</color>\n\n Build a contraption using your <color=teal>OBJECTS</color>. Guide the <color=silver>BALL</color> toward the <color=red>GOAL</color>. Collect every <color=yellow>STAR</color> to advance to the next level!";
+        }
+        else if (hintCounter == 5)
+        {
+            return "<size=200><color=lightblue>LET'S GET STARTED!</color></size>";
+        }
+        else
+        {
+            return null;
+        }
+    }
 
     private void ShowHint(Hand hand, EVRButtonId button, string hintText)
     {
         CancelHint(hand, button);
 
-        hintCoroutine = StartCoroutine(HintCoroutine(hand, button, hintText));
+        controllerHintCoroutine = StartCoroutine(HintCoroutine(hand, button, hintText));
     }
 
     private void CancelHint(Hand hand, EVRButtonId button)
     {
-        if (hintCoroutine != null)
+        if (controllerHintCoroutine != null)
         {
             ControllerButtonHints.HideTextHint(hand, button);
 
-            StopCoroutine(hintCoroutine);
-            hintCoroutine = null;
+            Debug.Log("cancelling controller hint");
+
+            StopCoroutine(controllerHintCoroutine);
+            controllerHintCoroutine = null;
         }
 
         CancelInvoke("ShowHint");
+    }
+
+    private void AddCoroutinesToList()
+    {
+        hintDict.Add(0, Hint1());
+        hintDict.Add(1, Hint2());
+        hintDict.Add(2, Hint3());
+        hintDict.Add(3, Hint4());
+        hintDict.Add(4, Hint5());
+        hintDict.Add(5, Hint6());
     }
 
     private IEnumerator HintCoroutine(Hand hand, EVRButtonId button, string hintText)
@@ -296,4 +381,5 @@ public class Introduction : MonoBehaviour {
             yield return null;
         }
     }
+
 }
