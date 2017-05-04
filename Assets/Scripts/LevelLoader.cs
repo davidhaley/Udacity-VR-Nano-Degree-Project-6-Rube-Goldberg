@@ -38,7 +38,7 @@ public class LevelLoader : MonoBehaviour {
 
         levels = new List<int>();
 
-        for (int i = 0; i < UnityEditor.SceneManagement.EditorSceneManager.loadedSceneCount; i++)
+        for (int i = 0; i < UnityEditor.SceneManagement.EditorSceneManager.sceneCountInBuildSettings; i++)
         {
             levels.Add(i);
         }
@@ -46,14 +46,6 @@ public class LevelLoader : MonoBehaviour {
         currentLevel = Convert.ToInt32(UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene().name);
         nextLevel = currentLevel + 1;
         lastLevel = levels.Count - 1;
-    }
-
-    private void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            LoadLevel(nextLevel);
-        }
     }
 
     private void OnLevelFinishedLoading(Scene scene, LoadSceneMode loadSceneMode)
@@ -70,13 +62,9 @@ public class LevelLoader : MonoBehaviour {
     {
         if (CollectablesManager.CollectablesRemaining() == 0)
         {
-            if (currentLevel != lastLevel)
+            if (currentLevel <= lastLevel)
             {
                 StartCoroutine(LoadLevelAfterDelay(4f));
-            }
-            else
-            {
-                // Show credits
             }
         }
     }
