@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UI;
 using Valve.VR.InteractionSystem;
 
@@ -37,9 +38,13 @@ public class ObjectMenuSelector : MonoBehaviour {
     private int currentTrampoline = 0;
     private int currentSpectatorCamera = 0;
 
+    private PlaySound menuSelectSound;
+    private PlaySound menuZeroObjectsAvailSound;
+
     private void Awake()
     {
         InitializeLimitTexts();
+        LoadAudio();
     }
 
     private void OnEnable()
@@ -136,6 +141,12 @@ public class ObjectMenuSelector : MonoBehaviour {
                     {
                         prefab.GetComponent<Rigidbody>().isKinematic = true;
                         PrefabParentLeftHand(prefab);
+                        menuSelectSound.Play();
+                    }
+                    else
+                    {
+                        // Zero objects available!
+                        menuZeroObjectsAvailSound.Play();
                     }
                 }
             }
@@ -163,6 +174,12 @@ public class ObjectMenuSelector : MonoBehaviour {
     private void SetLimitText(Text limitText, int current, int max)
     {
         limitText.text = (max - current).ToString() + " Available";
+    }
+
+    private void LoadAudio()
+    {
+        menuSelectSound = SoundManager.LoadAudio(gameObject, new List<string> { "Sounds/Effects/MenuSelect" }, 0.20f, false, false, false, "Effects");
+        menuZeroObjectsAvailSound = SoundManager.LoadAudio(gameObject, new List<string> { "Sounds/Effects/ZeroObjectsAvailable" }, 0.20f, false, false, false, "Effects");
     }
 
     private void OnParentHandHoverBegin(Interactable hoveringInteractable)

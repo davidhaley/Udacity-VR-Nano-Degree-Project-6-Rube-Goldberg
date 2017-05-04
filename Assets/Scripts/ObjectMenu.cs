@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 using Valve.VR.InteractionSystem;
 
 public class ObjectMenu : MonoBehaviour {
@@ -16,6 +17,8 @@ public class ObjectMenu : MonoBehaviour {
     private int currentObjectIndex = 0;
     private int prevObjectIndex;
 
+    private PlaySound menuScrollSound;
+
     private void OnEnable()
     {
         SteamVRControllerEvents.OnTouchpadTouch += OnTouchpadTouch;
@@ -25,6 +28,8 @@ public class ObjectMenu : MonoBehaviour {
 
     private void Awake()
     {
+        LoadAudio();
+
         if (objectMenu.activeSelf)
         {
             objectMenu.SetActive(false);
@@ -99,11 +104,14 @@ public class ObjectMenu : MonoBehaviour {
     {
         if (e.fixedHandOrientation == "Right")
         {
-            if (e.touchpadAxis.x > 0.5f)
+            if (e.touchpadAxis.x > 0.5f || e.touchpadAxis.x < 0.5f)
             {
                 prevObjectIndex = currentObjectIndex;
                 firstTimeShown = false;
-
+                menuScrollSound.Play();
+            }
+            if (e.touchpadAxis.x > 0.5f)
+            {
                 if (currentObjectIndex + 1 > menuObjectHolders.Count - 1)
                 {
                     // Out of range, loop to beginning
@@ -116,9 +124,6 @@ public class ObjectMenu : MonoBehaviour {
             }
             else if (e.touchpadAxis.x < 0.5f)
             {
-                prevObjectIndex = currentObjectIndex;
-                firstTimeShown = false;
-
                 if (currentObjectIndex - 1 < 0)
                 {
                     // Out of range, loop to end
@@ -130,5 +135,10 @@ public class ObjectMenu : MonoBehaviour {
                 }
             }
         }
+    }
+
+    private void LoadAudio()
+    {
+        menuScrollSound = SoundManager.LoadAudio(gameObject, new List<string> { "Sounds/Effects/MenuScroll" }, 0.20f, false, true, false, "Effects");
     }
 }
