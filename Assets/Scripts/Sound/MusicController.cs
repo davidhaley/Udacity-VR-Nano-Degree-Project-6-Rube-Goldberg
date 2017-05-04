@@ -71,4 +71,17 @@ public class MusicController : MonoBehaviour {
             audioSource.Play();
         }
     }
+
+    public IEnumerator FadeMusic(float seconds)
+    {
+        float currentVolume = audioSource.volume;
+        float volumeDecrement = currentVolume / seconds;
+
+        while (currentVolume > 0f)
+        {
+            currentVolume -= volumeDecrement * Time.deltaTime;
+            audioSource.volume = currentVolume;
+            yield return null;
+        }
+    }
 }
