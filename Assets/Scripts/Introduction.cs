@@ -52,7 +52,6 @@ public class Introduction : MonoBehaviour {
 
         AddCoroutinesToList();
 
-
         fadeCanvas = GetComponent<FadeCanvas>();
 
         if (instructions.gameObject.activeSelf == false)
@@ -72,10 +71,6 @@ public class Introduction : MonoBehaviour {
         {
             hintCoroutine = null;
         }
-
-        Debug.Log("Hint coroutine is null: " + hintCoroutine == null);
-        Debug.Log("Instruction coroutine is null: " + instructionHintCoroutine == null);
-        Debug.Log("Controller coroutine is null: " + controllerHintCoroutine == null);
 
         if (hintCoroutine == null)
         {
@@ -202,6 +197,12 @@ public class Introduction : MonoBehaviour {
 
         CancelInstructionHint(hintCounter);
         instructions.text = GetPlayerInstructions(hintCounter);
+
+        if (hintCounter == hintDict.Count - 1)
+        {
+            fadeCanvas.fadeSpeed = 2f;
+            fadeCanvas.ToggleFade();
+        }
     }
 
     public void CancelInstructionHint(int hintCounter)
