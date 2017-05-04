@@ -32,7 +32,6 @@ public class TutorialBounds : MonoBehaviour {
         // Track player's head (has existing rigidbody)
         if (col.gameObject.name == "HeadCollider" && !tutorialComplete)
         {
-            Debug.Log("player inside tutorial bounds");
             playerInTutorialBounds = true;
 
             if (teleportPointHolder.gameObject.activeSelf)
@@ -46,8 +45,6 @@ public class TutorialBounds : MonoBehaviour {
     {
         if (col.gameObject.name == "HeadCollider" && !tutorialComplete)
         {
-            Debug.Log("player outside tutorial bounds");
-
             playerInTutorialBounds = false;
 
             if (!teleportPointHolder.gameObject.activeSelf)

@@ -269,11 +269,8 @@ public class Introduction : MonoBehaviour {
 
     private void OnTouchpadTouch(SteamVRControllerEvents.ControllerEventArgs e)
     {
-        Debug.Log("touching touchpad");
         if (e.fixedHandOrientation == "Right")
         {
-            Debug.Log("touching right touchpad");
-
             bool isShowingHint = !string.IsNullOrEmpty(ControllerButtonHints.GetActiveHintText(Player.instance.rightHand, touchpad));
 
             if (isShowingHint && !cycleMenuHintActive)

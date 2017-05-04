@@ -13,10 +13,7 @@ public class SpectatorCameraFeed : MonoBehaviour {
 
     private void Awake()
     {
-        //spectatorCameraFeed = gameObject.transform.Find("SpectatorCameraFeed").gameObject;
-        //noCameraCanvasHolder = gameObject.transform.Find("NoCameraCanvasHolder").gameObject;
         InitializeGameObjects();
-
     }
 
     private void InitializeGameObjects()
@@ -58,13 +55,6 @@ public class SpectatorCameraFeed : MonoBehaviour {
         SteamVRControllerEvents.OnGripDown -= OnGripDown;
         SteamVRControllerEvents.OnGripUp -= OnGripUp;
     }
-
-    //private void OnLevelFinishedLoading(Scene scene, LoadSceneMode loadSceneMode)
-    //{
-    //    Debug.Log("inside on level finished loading: " + noCameraCanvasHolder);
-
-    //    InitializeGameObjects();
-    //}
 
     private void OnSpectatorCameraInstantiated()
     {
