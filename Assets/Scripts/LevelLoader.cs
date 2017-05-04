@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -13,13 +14,17 @@ public class LevelLoader : MonoBehaviour {
     private int nextLevel;
     private int lastLevel;
 
+    private PlaySound winSound;
+
     private void OnEnable()
     {
         Ball.ballTouchedGoal += OnBallTouchedGoal;
         SceneManager.sceneLoaded += OnLevelFinishedLoading;
     }
+
     void OnDisable()
     {
+        Ball.ballTouchedGoal -= OnBallTouchedGoal;
         SceneManager.sceneLoaded -= OnLevelFinishedLoading;
     }
 
@@ -28,6 +33,8 @@ public class LevelLoader : MonoBehaviour {
         DontDestroyOnLoad(this.gameObject);
 
         musicController = FindObjectOfType<MusicController>();
+
+        LoadAudio();
 
         levels = new List<int>();
 
@@ -65,7 +72,8 @@ public class LevelLoader : MonoBehaviour {
         {
             if (currentLevel != lastLevel)
             {
-                LoadLevel(nextLevel);
+                StartCoroutine(LoadLevelAfterDelay(4f));
+                //LoadLevel(nextLevel);
             }
             else
             {
@@ -88,5 +96,23 @@ public class LevelLoader : MonoBehaviour {
     private void ChangeMusic(int levelNum)
     {
         musicController.Change(levelNum);
+    }
+
+    private IEnumerator LoadLevelAfterDelay(float waitForSeconds)
+    {
+        // Cheer/clap when player wins
+        winSound.Play();
+
+        // Fade out the current music volume, so when it becomes zero, the next level loads
+        StartCoroutine(musicController.FadeMusic(waitForSeconds / 2));
+        yield return new WaitForSeconds(waitForSeconds);
+
+        LoadLevel(nextLevel);
+        yield return null;
+    }
+
+    private void LoadAudio()
+    {
+        winSound = SoundManager.LoadAudio(musicController.gameObject, new List<string> { "Sounds/Effects/Win" }, 0.70f, false, false, false, "Effects");
     }
 }
