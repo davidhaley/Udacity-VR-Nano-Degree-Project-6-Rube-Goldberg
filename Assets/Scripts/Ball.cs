@@ -44,6 +44,14 @@ public class Ball : MonoBehaviour {
     {
         Structure.onAttachedToHand += OnAttachedToHand;
         Structure.onDetachedFromHand += OnDetachedFromHand;
+        Introduction.OnTutorialComplete += OnTutorialComplete;
+    }
+
+    private void OnDisable()
+    {
+        Structure.onAttachedToHand -= OnAttachedToHand;
+        Structure.onDetachedFromHand -= OnDetachedFromHand;
+        Introduction.OnTutorialComplete -= OnTutorialComplete;
     }
 
     private void Awake()
@@ -262,5 +270,10 @@ public class Ball : MonoBehaviour {
         playSounds.Add(collectableSound);
         playSounds.Add(trampolineSound);
         playSounds.Add(metalPlankSound);
+    }
+
+    private void OnTutorialComplete()
+    {
+        ResetBall();
     }
 }

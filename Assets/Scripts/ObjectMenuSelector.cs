@@ -164,11 +164,30 @@ public class ObjectMenuSelector : MonoBehaviour {
 
     private void InitializeLimitTexts()
     {
-        SetLimitText(metalPlankLimitText, currentMetalPlank, metalPlankMax);
-        SetLimitText(woodPlankLimitText, currentWoodPlank, woodPlankMax);
-        SetLimitText(fanBodyLimitText, currentFan, fanMax);
-        SetLimitText(trampolineLimitText, currentTrampoline, trampolineMax);
-        SetLimitText(spectatorCameraLimitText, currentSpectatorCamera, spectatorCameraMax);
+        if (metalPlankLimitText != null)
+        {
+            SetLimitText(metalPlankLimitText, currentMetalPlank, metalPlankMax);
+        }
+
+        if (woodPlankLimitText != null)
+        {
+            SetLimitText(woodPlankLimitText, currentWoodPlank, woodPlankMax);
+        }
+
+        if (fanBodyLimitText != null)
+        {
+            SetLimitText(fanBodyLimitText, currentFan, fanMax);
+        }
+
+        if (trampolineLimitText != null)
+        {
+            SetLimitText(trampolineLimitText, currentTrampoline, trampolineMax);
+        }
+
+        if (spectatorCameraLimitText != null)
+        {
+            SetLimitText(spectatorCameraLimitText, currentSpectatorCamera, spectatorCameraMax);
+        }
     }
 
     private void SetLimitText(Text limitText, int current, int max)

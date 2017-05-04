@@ -16,6 +16,8 @@ public class ScoreManager : MonoBehaviour {
     public int incrementScoreBy = 1;
     private int score = 0;
 
+    private bool won = false;
+
     private DateTime startTime;
     private TimeSpan elapsedTime;
     private String displayTime;
@@ -65,15 +67,18 @@ public class ScoreManager : MonoBehaviour {
 
     private void InitializeScore()
     {
-        ActivateTexts();
-        win.gameObject.SetActive(false);
+        if (!won)
+        {
+            ActivateTexts();
+            win.gameObject.SetActive(false);
 
-        scoreText.text = System.String.Empty;
-        description.text = "Stars Collected:";
+            scoreText.text = System.String.Empty;
+            description.text = "Stars Collected:";
 
-        score = 0;
-        CollectablesManager.ResetCollectables();
-        SetScore();
+            score = 0;
+            CollectablesManager.ResetCollectables();
+            SetScore();
+        }
     }
 
     private void SetScore()
@@ -83,6 +88,7 @@ public class ScoreManager : MonoBehaviour {
 
     private void Win()
     {
+        won = true;
         DeactivateTexts();
         win.gameObject.SetActive(true);
     }

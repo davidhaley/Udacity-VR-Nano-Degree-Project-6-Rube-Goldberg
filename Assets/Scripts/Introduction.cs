@@ -10,10 +10,15 @@ using System.Collections.Specialized;
 
 public class Introduction : MonoBehaviour {
 
+    public delegate void TutorialComplete();
+
+    public static event TutorialComplete OnTutorialComplete;
+
     public Text instructions;
+    public TutorialBounds tutorialBounds;
+    public GameObject tutorialLevelGameObjectsHolder;
 
     private OrderedDictionary hintDict;
-
     private FadeCanvas fadeCanvas;
 
     private Valve.VR.EVRButtonId touchpad = Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad;
@@ -21,6 +26,7 @@ public class Introduction : MonoBehaviour {
 
     private int hintCounter = 0;
     private bool finishedHints = false;
+    private bool paused;
 
     private Coroutine hintCoroutine;
     private Coroutine controllerHintCoroutine;
@@ -59,27 +65,44 @@ public class Introduction : MonoBehaviour {
         {
             instructions.gameObject.SetActive(true);
         }
+
+        if (tutorialLevelGameObjectsHolder.activeSelf)
+        {
+            tutorialLevelGameObjectsHolder.gameObject.SetActive(false);
+        }
     }
 
     private void Start()
     {
+        Teleport.instance.enabled = false;
+
         StartCoroutine(BeginHintSequence(hintCounter));
     }
 
     private void Update()
     {
-        if (controllerHintCoroutine == null && instructionHintCoroutine == null)
+        if (tutorialBounds.PlayerInTutorialBounds)
         {
-            hintCoroutine = null;
-        }
+            paused = false;
 
-        if (hintCoroutine == null)
-        {
-            if (hintCounter <= hintDict.Keys.Count)
+            if (controllerHintCoroutine == null && instructionHintCoroutine == null)
             {
-                hintCounter += 1;
-                StartCoroutine(BeginHintSequence(hintCounter));
+                hintCoroutine = null;
             }
+
+            if (hintCoroutine == null)
+            {
+                if (hintCounter <= hintDict.Keys.Count)
+                {
+                    // Player not finished tutorial
+                    hintCounter += 1;
+                    StartCoroutine(BeginHintSequence(hintCounter));
+                }
+            }
+        }
+        else
+        {
+            paused = true;
         }
     }
 
@@ -181,6 +204,8 @@ public class Introduction : MonoBehaviour {
     {
         yield return new WaitForSeconds(7f);
 
+        Teleport.instance.enabled = true;
+
         Teleport.instance.ShowTeleportHint();
         yield return null;
 
@@ -188,6 +213,12 @@ public class Introduction : MonoBehaviour {
 
     private IEnumerator ChangeInstructionCoroutine(int hintCounter)
     {
+        // Only takes effect when player teleports outside starting bounds
+        while (paused)
+        {
+            yield return new WaitForSeconds(0.5f);
+        }
+
         // Wait some time before changing the instructions after the player ends the controller hint
         if (hintCounter > 0)
         {
@@ -200,9 +231,29 @@ public class Introduction : MonoBehaviour {
 
         if (hintCounter == hintDict.Count - 1)
         {
-            fadeCanvas.fadeSpeed = 2f;
-            fadeCanvas.ToggleFade();
+            // Player finished tutorial, begin simple level
+            BeginTutorialLevel();
+
+            if (OnTutorialComplete == null)
+            {
+                OnTutorialComplete();
+            }
         }
+    }
+
+    private void BeginTutorialLevel()
+    {
+        // Fade tutorial canvas
+        fadeCanvas.fadeSpeed = 2f;
+        fadeCanvas.ToggleFade();
+
+        // Activate level objects
+        if (!tutorialLevelGameObjectsHolder.activeSelf)
+        {
+            tutorialLevelGameObjectsHolder.SetActive(true);
+        }
+
+        // Reset ball
     }
 
     public void CancelInstructionHint(int hintCounter)
@@ -218,8 +269,11 @@ public class Introduction : MonoBehaviour {
 
     private void OnTouchpadTouch(SteamVRControllerEvents.ControllerEventArgs e)
     {
+        Debug.Log("touching touchpad");
         if (e.fixedHandOrientation == "Right")
         {
+            Debug.Log("touching right touchpad");
+
             bool isShowingHint = !string.IsNullOrEmpty(ControllerButtonHints.GetActiveHintText(Player.instance.rightHand, touchpad));
 
             if (isShowingHint && !cycleMenuHintActive)

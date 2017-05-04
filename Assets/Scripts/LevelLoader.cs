@@ -73,7 +73,6 @@ public class LevelLoader : MonoBehaviour {
             if (currentLevel != lastLevel)
             {
                 StartCoroutine(LoadLevelAfterDelay(4f));
-                //LoadLevel(nextLevel);
             }
             else
             {
