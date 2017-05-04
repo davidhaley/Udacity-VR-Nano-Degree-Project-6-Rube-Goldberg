@@ -26,6 +26,13 @@ public class ObjectMenu : MonoBehaviour {
         SteamVRControllerEvents.OnTouchpadDown += OnTouchpadDown;
     }
 
+    private void OnDisable()
+    {
+        SteamVRControllerEvents.OnTouchpadTouch -= OnTouchpadTouch;
+        SteamVRControllerEvents.OnTouchpadRelease -= OnTouchpadRelease;
+        SteamVRControllerEvents.OnTouchpadDown -= OnTouchpadDown;
+    }
+
     private void Awake()
     {
         LoadAudio();
