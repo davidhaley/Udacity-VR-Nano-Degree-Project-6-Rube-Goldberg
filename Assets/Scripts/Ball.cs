@@ -20,18 +20,9 @@ public class Ball : MonoBehaviour {
     public static event BallTouchedGround ballTouchedGoal;
     public static event BallTouchedGround ballTouchedCollectable;
 
-    public GameObject collectableAudio;
-    public GameObject trampolineAudio;
-    public GameObject metalPlankAudio;
-    public GameObject woodPlankAudio;
-
-    private PlaySound collectablePlaySound;
-    private PlaySound trampolinePlaySound;
-    private PlaySound metalPlankPlaySound;
-
-    private AudioSource collectableAudioSource;
-    private AudioSource trampolineAudioSource;
-    private AudioSource metalPlankAudioSource;
+    private PlaySound collectableSound;
+    private PlaySound trampolineSound;
+    private PlaySound metalPlankSound;
 
     private Rigidbody rigidBody;
     private Vector3 resetPosition;
@@ -47,8 +38,7 @@ public class Ball : MonoBehaviour {
 
     private bool structureAttachedToHand;
 
-    AudioMixer audioMixer;
-    private List<AudioSource> audioSources;
+    private List<PlaySound> playSounds;
 
     private void OnEnable()
     {
@@ -59,16 +49,7 @@ public class Ball : MonoBehaviour {
     private void Awake()
     {
         InitializeBall();
-
-        audioMixer = Resources.Load("MasterMixer") as AudioMixer;
-        audioSources = new List<AudioSource>();
-    }
-
-    private void Start()
-    {
-        LoadCollectableAudio();
-        LoadTrampolineAudio();
-        LoadMetalPlankAudio();
+        LoadAudio();
     }
 
     private void FixedUpdate()
@@ -123,7 +104,7 @@ public class Ball : MonoBehaviour {
         }
         else if (collision.gameObject.CompareTag("Trampoline"))
         {
-            trampolinePlaySound.Play();
+            trampolineSound.Play();
         }
     }
 
@@ -131,9 +112,9 @@ public class Ball : MonoBehaviour {
     {
         if (collision.gameObject.CompareTag("MetalPlank"))
         {
-            if (!metalPlankAudioSource.isPlaying)
+            if (!SoundManager.AudioSourcePlaying(metalPlankSound))
             {
-                metalPlankPlaySound.Play();
+                metalPlankSound.Play();
             }
         }
     }
@@ -142,7 +123,7 @@ public class Ball : MonoBehaviour {
     {
         if (collision.gameObject.CompareTag("MetalPlank"))
         {
-            StartCoroutine(StopAfterDelay(metalPlankPlaySound, 0.7f));
+            StartCoroutine(StopAfterDelay(metalPlankSound, 0.7f));
         }
     }
 
@@ -156,6 +137,7 @@ public class Ball : MonoBehaviour {
     {
         if (col.gameObject.CompareTag("Collectable") && ballActive)
         {
+            // Determine collectable sound pitch (pitches increases as less collectables remain)
             int numberOfCollectablesPickedUp = CollectablesManager.collectables.Length - CollectablesManager.CollectablesRemaining();
             float pitchIncrement = (maxPitchCollectable - minPitchCollectable) / CollectablesManager.collectables.Length;
             float currentPitch = minPitchCollectable + (numberOfCollectablesPickedUp * pitchIncrement);
@@ -165,9 +147,10 @@ public class Ball : MonoBehaviour {
                 currentPitch = minPitchCollectable;
             }
 
-            collectableAudioSource.pitch = currentPitch;
-            collectablePlaySound.Play();
+            SoundManager.SetAudioSourcePitch(collectableSound, currentPitch);
+            collectableSound.Play();
 
+            // Disable the collectable
             col.gameObject.SetActive(false);
 
             if (ballTouchedCollectable != null)
@@ -219,13 +202,15 @@ public class Ball : MonoBehaviour {
 
     private void ResetBall()
     {
+        // Reset the ball to its starting position
         gameObject.transform.position = resetPosition;
         rigidBody.velocity = resetVelocity;
         rigidBody.angularVelocity = resetAngularVelocity;
 
-        StopAudioSources();
+        // Stop any sounds that were playing before the reset
+        SoundManager.StopAllAudio(playSounds);
 
-        // Keep ball deactivated if player holds onto structure as ball resets
+        // Keep ball deactivated if player holds onto structure as ball resets (prevents cheating)
         if (structureAttachedToHand)
         {
             DeactivateBall();
@@ -233,17 +218,6 @@ public class Ball : MonoBehaviour {
         else
         {
             ActivateBall();
-        }
-    }
-
-    private void StopAudioSources()
-    {
-        foreach (AudioSource audioSource in audioSources)
-        {
-            if (audioSource.isPlaying)
-            {
-                audioSource.Stop();
-            }
         }
     }
 
@@ -267,73 +241,26 @@ public class Ball : MonoBehaviour {
         }
     }
 
-    private void LoadCollectableAudio()
+    private void LoadAudio()
     {
-        AudioClip clip1 = Resources.Load<AudioClip>("Sounds/Effects/Collectable");
-        AudioClip[] clips = new AudioClip[1];
-        clips[0] = clip1;
+        playSounds = new List<PlaySound>();
 
-        collectablePlaySound = collectableAudio.AddComponent<PlaySound>();
-        collectablePlaySound.waveFile = clips;
-        collectablePlaySound.useRandomVolume = false;
-        collectablePlaySound.useRandomPitch = false;
+        // Collectable
+        collectableSound = SoundManager.LoadAudio(gameObject, new List<string> { "Sounds/Effects/Collectable" }, 0.30f, false, false, false, "Effects", 2f, 1f);
 
-        collectableAudioSource = collectableAudio.GetComponent<AudioSource>();
-        collectableAudioSource.playOnAwake = false;
-        collectableAudioSource.volume = 0.30f;
-        collectableAudioSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Effects")[0];
-        audioSources.Add(collectableAudioSource);
+        //Trampoline
+        List<string> trampolineAudioPaths = new List<string>();
+        trampolineAudioPaths.Add("Sounds/Effects/Trampoline1");
+        trampolineAudioPaths.Add("Sounds/Effects/Trampoline2");
+        trampolineAudioPaths.Add("Sounds/Effects/Trampoline3");
 
-        LoadPhononEffect(collectableAudio);
-    }
+        trampolineSound = SoundManager.LoadAudio(gameObject, trampolineAudioPaths, 0.50f, false, false, false, "Effects");
 
-    private void LoadTrampolineAudio()
-    {
-        AudioClip clip1 = Resources.Load<AudioClip>("Sounds/Effects/Trampoline1");
-        AudioClip clip2 = Resources.Load<AudioClip>("Sounds/Effects/Trampoline2");
-        AudioClip clip3 = Resources.Load<AudioClip>("Sounds/Effects/Trampoline3");
+        // Metal Plank
+        metalPlankSound = SoundManager.LoadAudio(gameObject, new List<string> { "Sounds/Effects/RollingBallMetal" }, 0.25f, false, false, false, "Effects");
 
-        AudioClip[] clips = new AudioClip[3];
-        clips[0] = clip1;
-        clips[1] = clip2;
-        clips[2] = clip3;
-
-        trampolinePlaySound = trampolineAudio.AddComponent<PlaySound>();
-        trampolinePlaySound.waveFile = clips;
-
-        trampolineAudioSource = trampolineAudio.GetComponent<AudioSource>();
-        trampolineAudioSource.playOnAwake = false;
-        trampolineAudioSource.volume = 0.50f;
-        trampolineAudioSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Effects")[0];
-        audioSources.Add(trampolineAudioSource);
-
-        LoadPhononEffect(trampolineAudio);
-    }
-
-    private void LoadMetalPlankAudio()
-    {
-        AudioClip clip1 = Resources.Load<AudioClip>("Sounds/Effects/RollingBallMetal");
-
-        AudioClip[] clips = new AudioClip[1];
-        clips[0] = clip1;
-
-        metalPlankPlaySound = metalPlankAudio.AddComponent<PlaySound>();
-        metalPlankPlaySound.useRandomVolume = false;
-        metalPlankPlaySound.waveFile = clips;
-
-        metalPlankAudioSource = metalPlankAudio.GetComponent<AudioSource>();
-        metalPlankAudioSource.playOnAwake = false;
-        metalPlankAudioSource.volume = 0.25f;
-        metalPlankAudioSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Effects")[0];
-        audioSources.Add(metalPlankAudioSource);
-
-        LoadPhononEffect(metalPlankAudio);
-    }
-
-    private void LoadPhononEffect(GameObject go)
-    {
-        Phonon.PhononSource phonon = go.AddComponent<Phonon.PhononSource>();
-        phonon.enableReflections = true;
-        phonon.directBinauralEnabled = true;
+        playSounds.Add(collectableSound);
+        playSounds.Add(trampolineSound);
+        playSounds.Add(metalPlankSound);
     }
 }

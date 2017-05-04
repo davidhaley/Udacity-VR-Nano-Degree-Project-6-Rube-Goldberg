@@ -139,6 +139,6 @@ public class ObjectMenu : MonoBehaviour {
 
     private void LoadAudio()
     {
-        menuScrollSound = SoundManager.LoadAudio(gameObject, new List<string> { "Sounds/Effects/MenuScroll" }, 0.20f, false, true, false, "Effects");
+        menuScrollSound = SoundManager.LoadAudio(gameObject, new List<string> { "Sounds/Effects/MenuScroll" }, 0.50f, false, false, false, "Effects");
     }
 }

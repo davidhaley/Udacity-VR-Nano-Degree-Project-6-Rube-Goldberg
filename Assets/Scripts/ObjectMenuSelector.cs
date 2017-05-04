@@ -178,7 +178,7 @@ public class ObjectMenuSelector : MonoBehaviour {
 
     private void LoadAudio()
     {
-        menuSelectSound = SoundManager.LoadAudio(gameObject, new List<string> { "Sounds/Effects/MenuSelect" }, 0.20f, false, false, false, "Effects");
+        menuSelectSound = SoundManager.LoadAudio(gameObject, new List<string> { "Sounds/Effects/MenuSelect" }, 0.25f, false, false, false, "Effects");
         menuZeroObjectsAvailSound = SoundManager.LoadAudio(gameObject, new List<string> { "Sounds/Effects/ZeroObjectsAvailable" }, 0.20f, false, false, false, "Effects");
     }
 
