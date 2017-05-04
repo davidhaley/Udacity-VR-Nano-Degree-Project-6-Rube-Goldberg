@@ -31,6 +31,8 @@ public class Introduction : MonoBehaviour {
     private string buttonColor = "<color=orange>";
     private string outcomeColor = "<color=blue>";
 
+    private PlaySound pageTurnSound;
+
 
     private void OnEnable()
     {
@@ -48,9 +50,8 @@ public class Introduction : MonoBehaviour {
 
     private void Awake()
     {
-        hintDict = new OrderedDictionary();
-
-        AddCoroutinesToList();
+        AddHintCoroutinesToList();
+        LoadAudio();
 
         fadeCanvas = GetComponent<FadeCanvas>();
 
@@ -76,7 +77,6 @@ public class Introduction : MonoBehaviour {
         {
             if (hintCounter <= hintDict.Keys.Count)
             {
-                Debug.Log("incrementing counter at: " + Time.time);
                 hintCounter += 1;
                 StartCoroutine(BeginHintSequence(hintCounter));
             }
@@ -87,7 +87,6 @@ public class Introduction : MonoBehaviour {
     {
         if (hintDict.Contains(hintCounter))
         {
-            Debug.Log("starting coroutine");
             hintCoroutine = StartCoroutine(hintDict[hintCounter] as IEnumerator);
         }
 
@@ -196,6 +195,7 @@ public class Introduction : MonoBehaviour {
         }
 
         CancelInstructionHint(hintCounter);
+        pageTurnSound.Play();
         instructions.text = GetPlayerInstructions(hintCounter);
 
         if (hintCounter == hintDict.Count - 1)
@@ -316,8 +316,6 @@ public class Introduction : MonoBehaviour {
         {
             ControllerButtonHints.HideTextHint(hand, button);
 
-            Debug.Log("cancelling controller hint");
-
             StopCoroutine(controllerHintCoroutine);
             controllerHintCoroutine = null;
         }
@@ -325,8 +323,10 @@ public class Introduction : MonoBehaviour {
         CancelInvoke("ShowHint");
     }
 
-    private void AddCoroutinesToList()
+    private void AddHintCoroutinesToList()
     {
+        hintDict = new OrderedDictionary();
+
         hintDict.Add(0, Hint1());
         hintDict.Add(1, Hint2());
         hintDict.Add(2, Hint3());
@@ -364,7 +364,6 @@ public class Introduction : MonoBehaviour {
             {
                 ControllerButtonHints.HideTextHint(hand, button);
             }
-            //}
 
             if (Time.time > prevBreakTime + 3.0f)
             {
@@ -381,6 +380,15 @@ public class Introduction : MonoBehaviour {
 
             yield return null;
         }
+    }
+
+    private void LoadAudio()
+    {
+        List<string> pageTurnSounds = new List<string>();
+        pageTurnSounds.Add("Sounds/Effects/PageTurn1");
+        pageTurnSounds.Add("Sounds/Effects/PageTurn2");
+
+        pageTurnSound = SoundManager.LoadAudio(gameObject, pageTurnSounds, 0.075f, false, false, false, "Effects");
     }
 
 }
