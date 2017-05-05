@@ -20,6 +20,7 @@ public class Introduction : MonoBehaviour {
 
     private OrderedDictionary hintDict;
     private FadeCanvas fadeCanvas;
+    private Throwable objectAttachedToLeftHand;
 
     private Valve.VR.EVRButtonId touchpad = Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad;
     private Valve.VR.EVRButtonId trigger = Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger;
@@ -32,6 +33,7 @@ public class Introduction : MonoBehaviour {
     private Coroutine instructionHintCoroutine;
 
     private bool cycleMenuHintActive = false;
+
     private string actionColor = "<color=olive>";
     private string buttonColor = "<color=orange>";
     private string outcomeColor = "<color=blue>";
@@ -310,7 +312,12 @@ public class Introduction : MonoBehaviour {
 
             if (isShowingHint)
             {
-                CancelHint(Player.instance.leftHand, trigger);
+                bool objectAttachedToLeftHand = Player.instance.leftHand.currentAttachedObject.GetComponent<Throwable>() != null;
+
+                if (objectAttachedToLeftHand)
+                {
+                    CancelHint(Player.instance.leftHand, trigger);
+                }
             }
         }
     }
@@ -440,5 +447,4 @@ public class Introduction : MonoBehaviour {
 
         pageTurnSound = SoundManager.LoadAudio(gameObject, pageTurnSounds, 0.075f, false, false, false, "Effects");
     }
-
 }

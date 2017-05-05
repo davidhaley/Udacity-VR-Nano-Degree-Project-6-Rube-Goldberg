@@ -140,7 +140,7 @@ public class ObjectMenuSelector : MonoBehaviour {
                     if (prefab != null)
                     {
                         prefab.GetComponent<Rigidbody>().isKinematic = true;
-                        PrefabParentLeftHand(prefab);
+                        leftHand.AttachObject(prefab);
                         menuSelectSound.Play();
                     }
                     else
@@ -212,12 +212,5 @@ public class ObjectMenuSelector : MonoBehaviour {
     private void OnParentHandHoverEnd()
     {
         menuObjectHovering = null;
-    }
-
-    private void PrefabParentLeftHand(GameObject prefab)
-    {
-        prefab.transform.SetParent(leftHand.transform);
-        prefab.transform.localPosition = Vector3.zero;
-        prefab.transform.rotation = leftHand.transform.rotation;
     }
 }
