@@ -1,7 +1,7 @@
-# README #
+# Rube Goldberg
 
-This is the starter project for Rube Goldberg Challenge
+### Project Dependencies
 
-### What is this repository for? ###
-
-* You should find everything you need in `VRND_C8A_ProjectAssetPack/Assets`
+Unity 2017.1.0b1
+Steam Audio (Phonon) - Included
+SteamVR v1.21 - Included
