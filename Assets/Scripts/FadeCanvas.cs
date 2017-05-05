@@ -17,7 +17,6 @@ public class FadeCanvas : MonoBehaviour {
     private CanvasGroup canvasGroup;
     private bool visible;
     private bool fadedOnce = false;
-    private GameObject refObj;
 
     private void Awake()
     {
@@ -27,7 +26,6 @@ public class FadeCanvas : MonoBehaviour {
         }
 
         canvasGroup = GetComponentInChildren<CanvasGroup>();
-        refObj = gameObject;
 
         SetState();
     }

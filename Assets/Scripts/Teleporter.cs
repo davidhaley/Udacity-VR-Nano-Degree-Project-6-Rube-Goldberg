@@ -15,12 +15,8 @@ public class Teleporter : MonoBehaviour {
     private GameObject teleportingObject;
     private Vector3 destination;
 
-    private TeleportDestination teleportDestination;
-
     private void Awake()
     {
-        teleportDestination = teleportDestinationGo.GetComponent<TeleportDestination>();
-
         teleportTargetAudioSource = gameObject.GetComponent<AudioSource>();
         teleportDestinationAudioSource = teleportDestinationGo.GetComponent<AudioSource>();
     }

@@ -38,12 +38,12 @@ public class LevelLoader : MonoBehaviour {
 
         levels = new List<int>();
 
-        for (int i = 0; i < UnityEditor.SceneManagement.EditorSceneManager.sceneCountInBuildSettings; i++)
+        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
         {
             levels.Add(i);
         }
 
-        currentLevel = Convert.ToInt32(UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene().name);
+        currentLevel = Convert.ToInt32(SceneManager.GetActiveScene().name);
         nextLevel = currentLevel + 1;
         lastLevel = levels.Count - 1;
     }

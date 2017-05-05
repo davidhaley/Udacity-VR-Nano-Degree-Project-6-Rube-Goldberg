@@ -25,7 +25,6 @@ public class Introduction : MonoBehaviour {
     private Valve.VR.EVRButtonId trigger = Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger;
 
     private int hintCounter = 0;
-    private bool finishedHints = false;
     private bool paused;
 
     private Coroutine hintCoroutine;
