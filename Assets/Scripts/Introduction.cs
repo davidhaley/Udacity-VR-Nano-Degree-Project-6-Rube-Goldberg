@@ -40,7 +40,6 @@ public class Introduction : MonoBehaviour {
 
     private PlaySound pageTurnSound;
 
-
     private void OnEnable()
     {
         SteamVRControllerEvents.OnTouchpadTouch += OnTouchpadTouch;
@@ -75,6 +74,7 @@ public class Introduction : MonoBehaviour {
 
     private void Start()
     {
+        // Enable teleport only after the tutorial hint
         Teleport.instance.enabled = false;
 
         StartCoroutine(BeginHintSequence(hintCounter));
